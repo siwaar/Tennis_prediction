@@ -7,8 +7,6 @@ You have to specify the following parameters:
 
 - data_csv_path : the path for the data set 
 
-Please keep all the remaining parameters unchanged.
-They are set based on the study that you can find on the notebook in which I explain my approach and my strategy.
 
 ### Install environment
 

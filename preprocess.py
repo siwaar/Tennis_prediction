@@ -36,9 +36,9 @@ class PreProcessing:
         Fill nan values
         """
         features_with_nan_values = self.get_columns_with_nan_values()
-        print(f'\nFeatures with Nan values : {json.dumps(features_with_nan_values, indent = 4)}')
-        print(f'\nFeatures to fill nan values by median : {self.features_to_fill_by_median}')
-        print(f'\nFeatures to fill nan values by a new category unknown : {self.features_to_fill_by_new_category}')
+        print(f'\nFeatures with missing values : {json.dumps(features_with_nan_values, indent = 4)}')
+        print(f'\nFeatures to fill missing values with median : {self.features_to_fill_by_median}')
+        print(f'\nFeatures to fill missing values with a new category unknown : {self.features_to_fill_by_new_category}')
               
         for c in self.features_to_fill_by_median:
             self.data[c] = self.data[c].fillna((self.data[c].median()))
@@ -48,16 +48,18 @@ class PreProcessing:
             self.data[c] = self.data[c].astype('str').replace("nan", "unk") 
         
         ## drop the value of the hand column
-        self.data.p1_hand.fillna('U')
-        self.data.p2_hand.fillna('U')
+        self.data['p1_hand'] = self.data['p1_hand'].fillna('U')
+        self.data['p2_hand'] = self.data['p2_hand'].fillna('U')
         self.data.reset_index(inplace=True, drop=True)
         
         features_with_nan_values = self.get_columns_with_nan_values()
-        print(f'\nFeatures with Nan values after pre-processing: {features_with_nan_values}')
+        print(f'\nFeatures with missing values after pre-processing: {features_with_nan_values}')
             
         return None
     
     def preprocess(self) -> pd.DataFrame:
+        
+        print(f'''\n{'-'*20} Preprocessing data  {'-'*20}''')
         # drop duplicates
         self.data.drop_duplicates(inplace=True)
         # drop useless cols

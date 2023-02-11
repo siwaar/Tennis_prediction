@@ -1,13 +1,9 @@
 data_csv_path : data/ATP_tweaked.csv
 
-features_to_drop : ["tourney_name", "tourney_id", "p2_name", "p1_name", "p2_id", "p1_id"]
-features_to_fill_by_median_per_player : [[f"p{p}_1stIn", f"p{p}_1stWon", 
-              f"p{p}_2ndWon", f"p{p}_SvGms", 
-              f"p{p}_ace", f"p{p}_bpFaced", 
-              f"p{p}_bpSaved", f"p{p}_df", 
-              f"p{p}_svpt", f"p{p}_rank", 
-              f"p{p}_rank_points", f"p{p}_age", 
-              f"p{p}_ht"] for p in range(1,3)]
-features_to_fill_by_median : features_to_fill_by_median_per_player[0] + features_to_fill_by_median_per_player[1] + ["minutes"]
+features_to_drop : ['tourney_name', 'tourney_id', 'p2_name', 'p1_name', 'p2_id', 'p1_id']
+features_to_fill_by_median : ['p1_1stIn','p1_1stWon','p1_2ndWon','p1_SvGms','p1_ace',
+ 'p1_bpFaced','p1_bpSaved','p1_df','p1_svpt','p1_rank','p1_rank_points','p1_age',
+ 'p1_ht','p2_1stIn','p2_1stWon','p2_2ndWon','p2_SvGms','p2_ace','p2_bpFaced','p2_bpSaved','p2_df','p2_svpt',
+ 'p2_rank','p2_rank_points','p2_age','p2_ht','minutes']
 
-features_to_fill_by_new_category : [f"p1_seed", f"p1_entry", f"p2_seed", f"p2_entry"]
+features_to_fill_by_new_category : ['p1_seed', 'p1_entry', 'p2_seed', 'p2_entry']

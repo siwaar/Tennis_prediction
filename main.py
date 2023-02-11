@@ -15,11 +15,18 @@ def load_data(data_path: str) -> pd.DataFrame:
 
 
 def preprocess_data(params: dict[str, str]) -> None:
+    """
+        Load and process data.
+        It takes as parameter a dictionary containing:
+        data path and selected columns to deal with the task.
+
+    """
     # Load data
     data = load_data(params['data_csv_path'])
     # Preprocess data
     preprocessing = PreProcessing(data, params['features_to_drop'],  \
         params['features_to_fill_by_median'], params['features_to_fill_by_new_category'])
+    preprocessing.preprocess()
     return 
 
 
