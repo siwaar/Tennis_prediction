@@ -2,37 +2,48 @@ import pandas as pd
 import json
 
 class PreProcessing:
-    ''' Deal with nan values, drop useless columns'''
+    """Deal with nan values, drop useless columns"""
     
-    def __init__(self, data: pd.DataFrame) -> None:
+    def __init__(self, data: pd.DataFrame, features_to_drop:list[str], features_to_fill_by_median:list[str],\
+         features_to_fill_by_new_category:list[str]) -> None:
         self.data = data.copy()
-    
+        self.features_to_drop = features_to_drop
+        self.features_to_fill_by_median = features_to_fill_by_median
+        self.features_to_fill_by_new_category = features_to_fill_by_new_category
+
     def get_columns_with_nan_values(self) -> dict[str, str]:
         """
         Find columns that contain nan values.
         """
-        features_with_nan_values : dict[str, float]={}
         nb_lines = self.data.shape[0]
-        for c in self.data.columns :
-            if self.data[c].count() < nb_lines:
-                features_with_nan_values[c] = round((1 - self.data[c].count()/self.data.shape[0]) * 100, 2)
-              
-        return {k: str(v)+'%' for k,v in sorted(features_with_nan_values.items(), key=lambda item: item[1], reverse=True)}
+        features_with_nan_values: dict[str, float] = {
+            c: round((1 - self.data[c].count() / self.data.shape[0]) * 100, 2)
+            for c in self.data.columns
+            if self.data[c].count() < nb_lines
+        }
+        return {
+            k: f'{str(v)}%'
+            for k, v in sorted(
+                features_with_nan_values.items(),
+                key=lambda item: item[1],
+                reverse=True,
+            )
+        }
                 
  
-    def _fill_nan_values(self, cols_median:list[str], cols_categorical:list[str]) -> None:
+    def _fill_nan_values(self) -> None:
         """
         Fill nan values
         """
         features_with_nan_values = self.get_columns_with_nan_values()
         print(f'\nFeatures with Nan values : {json.dumps(features_with_nan_values, indent = 4)}')
-        print(f'\nFeatures to fill nan values by median : {cols_median}')
-        print(f'\nFeatures to fill nan values by a new category unknown : {cols_categorical}')
+        print(f'\nFeatures to fill nan values by median : {self.features_to_fill_by_median}')
+        print(f'\nFeatures to fill nan values by a new category unknown : {self.features_to_fill_by_new_category}')
               
-        for c in cols_median:
+        for c in self.features_to_fill_by_median:
             self.data[c] = self.data[c].fillna((self.data[c].median()))
                         
-        for c in cols_categorical:
+        for c in self.features_to_fill_by_new_category:
             # fill nan values by a new category unknown(unk)
             self.data[c] = self.data[c].astype('str').replace("nan", "unk") 
         
@@ -46,15 +57,13 @@ class PreProcessing:
             
         return None
     
-    def preprocess(self, cols_to_drop: list[str], cols_median:list[str], cols_categorical:list[str]) -> pd.DataFrame:
+    def preprocess(self) -> pd.DataFrame:
         # drop duplicates
-        print(f'Features to drop: {features_to_drop}')
         self.data.drop_duplicates(inplace=True)
         # drop useless cols
-        self.data.drop(columns=cols_to_drop, axis=1)
-        
-
+        print(f'Features to drop: {self.features_to_drop}')
+        self.data.drop(columns=self.features_to_drop, axis=1)
         # fill nan values
-        self._fill_nan_values(cols_median, cols_categorical)
+        self._fill_nan_values()
         return self.data
         
