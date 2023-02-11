@@ -1,11 +1,13 @@
 from ruamel.yaml import YAML
 import pandas as pd
 from feature_engineering import FeatureEngineering
-from model_training import score_classifier 
+from model_predict import predict
+from model_train import score_classifier, get_best_model
 from preprocess import PreProcessing
 from sklearn.model_selection import train_test_split
 from lightgbm import LGBMClassifier
 from xgboost import XGBClassifier
+from sklearn.metrics import classification_report
 
 def load_data(data_path: str) -> pd.DataFrame:
     """
@@ -64,11 +66,13 @@ def apply_feature_engineering(data: pd.DataFrame, params: dict[str, str]) -> tup
     
     return X_train, X_test, y_train, y_test
 
-def train_models(X_train, y_train )->None:
+def train_models(X_train, y_train ) -> None:
+    """ Train models """
+
     models = {'LGBMClassifier': LGBMClassifier,
        'XGBClassifier':XGBClassifier,
     }
-    
+
     best_m =''
     best_sc = 0
     for model in models:
@@ -78,7 +82,7 @@ def train_models(X_train, y_train )->None:
             best_sc = score
             best_m = model
     print(f'Best model based on f1 score :{best_m} with score : {round(best_sc*100,2)} %')
-    return 
+    return get_best_model(X_train, y_train, models[best_m])
 
 
 def main():
@@ -92,11 +96,11 @@ def main():
     # Load and preprocess data 
     data = preprocess_data(params)
     X_train, X_test, y_train, y_test = apply_feature_engineering(data, params)
-    train_models(X_train, y_train)
-    
+    best_model = train_models(X_train, y_train)
+    y_pred = predict(best_model, X_train, X_test, y_train)
+    print(classification_report(y_test, y_pred))
 
     
-
 if __name__ == "__main__":
     main()
 

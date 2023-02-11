@@ -66,3 +66,20 @@ def score_classifier(dataset, classifier, labels):
     print(f"\nConfusion matrix : \n\n {confusion_mat}")
     print("\n############################\n")
     return f1_sc
+
+def get_best_model(X_train , y_train, classifier):
+    clf = GridSearchCV(
+            estimator=classifier(),
+            param_grid={'num_leaves': (15, 30, 45),
+                        'max_depth': (-1, 5, 10, 20),
+                        'learning_rate': (0.05, 0.1, 0.2, 0.4),
+                        'n_estimators': (25, 50, 100, 200)
+                        },
+            scoring='f1',
+            cv=3,
+            n_jobs=3,
+            verbose=1,
+            refit=True)
+
+    clf.fit(X_train,y_train)
+    return classifier(**clf.best_params_)
