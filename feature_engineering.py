@@ -10,12 +10,14 @@ class FeatureEngineering:
         self.categorical_features = categorical_features
         self.sk_kt_study_list = sk_kt_study_list
         
-    def transform(self) -> None:
+    def transform(self) -> pd.DataFrame:
         """
         Apply the feature engineering pipeline.
         """
-        # Add date features : 
+         # Add date features : 
         self._split_date()
+        # Add importance tourney feature:
+        self._importance_tourney()
         # Add number of set per match:
         self._sets_per_match()
         # Add the number of game pet match:
@@ -26,17 +28,24 @@ class FeatureEngineering:
         self._transform_seed_as_categorical()
         # create a dummies variables for categorical data
         self._process_categorical_data()
-        return 
+        return self.data
     
     def _split_date(self)-> None:
-        self.data['tourney_date'] = self.data['tourney_date'].map(lambda x : str(x).split(" ")[0])
-        self.data['tourney_date'] = pd.to_datetime(self.data['tourney_date'])
-        self.data['day_of_week'] = self.data['tourney_date'].apply(lambda val: val.day_name())
-        self.data['month'] = self.data['tourney_date'].apply(lambda val: val.month_name())
+        self.data["day"] = self.data["tourney_date"]%100
+        self.data["month"] = (self.data["tourney_date"]//100)%100
+        self.data["year"] = self.data["tourney_date"]//10000
         # we need to drop tourney_date because it's not a time series problem
         self.data.drop(columns=['tourney_date'], axis=1)
 
-        
+    def _importance_tourney(self) -> None:
+        """
+        Set A new column which represent the importance of the tourney.
+        """
+        importance_dict = {"G":6, "M": 5, "A": 4, "C": 4, "S": 3, "F" : 2, "D": 1}
+        importance = [importance_dict[k] for k in self.data["tourney_level"].tolist()]
+        self.data["tourney_importance"] = importance
+
+
     def _sets_per_match(self) -> None:
         """
         Get the number of set per match.

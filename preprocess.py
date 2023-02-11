@@ -11,6 +11,19 @@ class PreProcessing:
         self.features_to_fill_by_median = features_to_fill_by_median
         self.features_to_fill_by_new_category = features_to_fill_by_new_category
 
+    def preprocess(self) -> pd.DataFrame:
+        
+        print(f'''\n{'-'*20} Preprocessing data  {'-'*20}''')
+        # drop duplicates
+        self.data.drop_duplicates(inplace=True)
+        # drop useless cols
+        print(f'Features to drop: {self.features_to_drop}')
+        self.data.drop(columns=self.features_to_drop, inplace=True)
+        # fill nan values
+        self._fill_nan_values()
+        return self.data
+        
+
     def _get_columns_with_nan_values(self) -> dict[str, str]:
         """
         Find columns that contain nan values.
@@ -57,15 +70,4 @@ class PreProcessing:
             
         return None
     
-    def preprocess(self) -> pd.DataFrame:
-        
-        print(f'''\n{'-'*20} Preprocessing data  {'-'*20}''')
-        # drop duplicates
-        self.data.drop_duplicates(inplace=True)
-        # drop useless cols
-        print(f'Features to drop: {self.features_to_drop}')
-        self.data.drop(columns=self.features_to_drop, axis=1)
-        # fill nan values
-        self._fill_nan_values()
-        return self.data
-        
+   
