@@ -1,9 +1,11 @@
 from ruamel.yaml import YAML
 import pandas as pd
-from feature_engineering import FeatureEngineering 
+from feature_engineering import FeatureEngineering
+from model_training import score_classifier 
 from preprocess import PreProcessing
 from sklearn.model_selection import train_test_split
-
+from lightgbm import LGBMClassifier
+from xgboost import XGBClassifier
 
 def load_data(data_path: str) -> pd.DataFrame:
     """
@@ -38,7 +40,7 @@ def preprocess_data(params: dict[str, str]) -> pd.DataFrame:
 def apply_feature_engineering(data: pd.DataFrame, params: dict[str, str]) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series,pd.Series]:
     y = data["p1_won"]
     X = data.drop(columns=['p1_won'])
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, stratify =y, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
 
     X_train.reset_index(inplace=True, drop=True)
     y_train.reset_index(inplace=True, drop=True)
@@ -51,11 +53,33 @@ def apply_feature_engineering(data: pd.DataFrame, params: dict[str, str]) -> tup
 
     feature_engineering_test = FeatureEngineering(X_test, params['categorical_features_dummies'], params['sk_kt_study_list'])
     X_test = feature_engineering_test.transform()
-    
-    print(f'\nX_train shape after preprocessing : {X_train.shape}')
-    print(f'\nX_test shape after preprocessing : {X_test.shape}')
+    print(f'\nX_train shape after feature engineering : {X_train.shape}')
+    print(f'\nX_test shape after feature engineering : {X_test.shape}')
+
+    X_train.drop(columns=params["redundant_features"], inplace=True)
+    X_test.drop(columns=params["redundant_features"], inplace=True)
+
+    print(f'\nX_train shape after removing redundant features : {X_train.shape}')
+    print(f'\nX_test shape after removing redundant features : {X_test.shape}')
     
     return X_train, X_test, y_train, y_test
+
+def train_models(X_train, y_train )->None:
+    models = {'LGBMClassifier': LGBMClassifier,
+       'XGBClassifier':XGBClassifier,
+    }
+    
+    best_m =''
+    best_sc = 0
+    for model in models:
+        print(f'\nModel : {model}')
+        score = score_classifier(X_train, models[model](), y_train)
+        if score > best_sc:
+            best_sc = score
+            best_m = model
+    print(f'Best model based on f1 score :{best_m} with score : {round(best_sc*100,2)} %')
+    return 
+
 
 def main():
     # Load config: 
@@ -68,7 +92,7 @@ def main():
     # Load and preprocess data 
     data = preprocess_data(params)
     X_train, X_test, y_train, y_test = apply_feature_engineering(data, params)
-    
+    train_models(X_train, y_train)
     
 
     
