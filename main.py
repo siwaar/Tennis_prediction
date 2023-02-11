@@ -1,5 +1,6 @@
 from ruamel.yaml import YAML
-import pandas as pd 
+import pandas as pd
+from feature_engineering import FeatureEngineering 
 from preprocess import PreProcessing
 
 
@@ -14,7 +15,7 @@ def load_data(data_path: str) -> pd.DataFrame:
     return data
 
 
-def preprocess_data(params: dict[str, str]) -> None:
+def preprocess_data(params: dict[str, str]) -> pd.DataFrame:
     """
         Load and process data.
         It takes as parameter a dictionary containing:
@@ -27,7 +28,8 @@ def preprocess_data(params: dict[str, str]) -> None:
     preprocessing = PreProcessing(data, params['features_to_drop'],  \
         params['features_to_fill_by_median'], params['features_to_fill_by_new_category'])
     preprocessing.preprocess()
-    return 
+    
+    return preprocessing.data
 
 
 def main():
@@ -38,8 +40,17 @@ def main():
     with open(config_path) as f:
         params = yaml.load(f)
     
-    # Load and preprocess data :
-    preprocess_data(params)
+    # Load and preprocess data 
+    data = preprocess_data(params)
+
+    # Feature engineering
+    feature_engineering = FeatureEngineering(data, params['categorical_features_dummies'], params['sk_kt_study_list'])
+    feature_engineering.transform()
+
+    data = feature_engineering.data
+    print(f'\n Our new data contains {len(data.columns)} features')
+
+    
 
 if __name__ == "__main__":
     main()

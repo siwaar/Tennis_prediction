@@ -7,3 +7,10 @@ features_to_fill_by_median : ['p1_1stIn','p1_1stWon','p1_2ndWon','p1_SvGms','p1_
  'p2_rank','p2_rank_points','p2_age','p2_ht','minutes']
 
 features_to_fill_by_new_category : ['p1_seed', 'p1_entry', 'p2_seed', 'p2_entry']
+
+categorical_features_dummies : ['best_of', 'round', 'tourney_level', 'surface', 
+'p1_hand','p2_hand','p1_entry', 'p2_entry', 'p1_ioc', 'p2_ioc']
+
+sk_kt_study_list : ['p2_1stIn', 'p2_1stWon', 'p2_2ndWon', 'p2_SvGms', 'p2_ace', 'p2_bpFaced',
+ 'p2_bpSaved', 'p2_df', 'p2_svpt', 'match_num', 'minutes', 'tourney_date',
+'p1_1stIn', 'p1_1stWon', 'p1_2ndWon', 'p1_SvGms', 'p1_ace', 'p1_bpFaced', 'p1_bpSaved', 'p1_df', 'p1_svpt']
