@@ -1,4 +1,5 @@
 data_csv_path : data/ATP_tweaked.csv
+model_path : 'model/'
 
 features_to_drop : ['tourney_name', 'tourney_id', 'p2_name', 'p1_name', 'p2_id', 'p1_id']
 features_to_fill_by_median : ['p1_1stIn', 'p1_1stWon', 'p1_2ndWon', 'p1_SvGms', 'p1_ace', 

@@ -11,6 +11,7 @@ def predict(model, X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.Seri
     output : 
         
     """
+    print(f'''\n{'-'*20} Model prediction  {'-'*20}''')
     def intersection(lst1: list[str], lst2: list[str]) -> list[str]:
         return list(set(lst1) & set(lst2))
 

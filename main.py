@@ -2,12 +2,12 @@ from ruamel.yaml import YAML
 import pandas as pd
 from feature_engineering import FeatureEngineering
 from model_predict import predict
-from model_train import score_classifier, get_best_model
+from model_train import train_models
 from preprocess import PreProcessing
 from sklearn.model_selection import train_test_split
-from lightgbm import LGBMClassifier
-from xgboost import XGBClassifier
+
 from sklearn.metrics import classification_report
+import pickle
 
 def load_data(data_path: str) -> pd.DataFrame:
     """
@@ -37,9 +37,13 @@ def preprocess_data(params: dict[str, str]) -> pd.DataFrame:
         params['features_to_fill_by_median'], params['features_to_fill_by_new_category'])
     preprocessing.preprocess()
     print(f'\nData shape after preprocessing : {preprocessing.data.shape}')
+
     return preprocessing.data
 
 def apply_feature_engineering(data: pd.DataFrame, params: dict[str, str]) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series,pd.Series]:
+    """ Apply feature engineering on both train and test data """
+
+    print(f'''\n{'-'*20} Feature Engineering  {'-'*20}''')
     y = data["p1_won"]
     X = data.drop(columns=['p1_won'])
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
@@ -66,24 +70,6 @@ def apply_feature_engineering(data: pd.DataFrame, params: dict[str, str]) -> tup
     
     return X_train, X_test, y_train, y_test
 
-def train_models(X_train, y_train ) -> None:
-    """ Train models """
-
-    models = {'LGBMClassifier': LGBMClassifier,
-       'XGBClassifier':XGBClassifier,
-    }
-
-    best_m =''
-    best_sc = 0
-    for model in models:
-        print(f'\nModel : {model}')
-        score = score_classifier(X_train, models[model](), y_train)
-        if score > best_sc:
-            best_sc = score
-            best_m = model
-    print(f'Best model based on f1 score :{best_m} with score : {round(best_sc*100,2)} %')
-    return get_best_model(X_train, y_train, models[best_m])
-
 
 def main():
     # Load config: 
@@ -95,8 +81,13 @@ def main():
     
     # Load and preprocess data 
     data = preprocess_data(params)
+    # Feature Engineering
     X_train, X_test, y_train, y_test = apply_feature_engineering(data, params)
+    # Train and choose the best model
     best_model = train_models(X_train, y_train)
+    # Save model
+    pickle.dump(best_model, open(params['model_path']+'lightGBM_model.pkl', 'wb'))
+    # Prediction
     y_pred = predict(best_model, X_train, X_test, y_train)
     print(classification_report(y_test, y_pred))
 
