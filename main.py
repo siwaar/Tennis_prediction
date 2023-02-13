@@ -46,7 +46,7 @@ def apply_feature_engineering(data: pd.DataFrame, params: dict[str, str]) -> tup
     print(f'''\n{'-'*20} Feature Engineering  {'-'*20}''')
     y = data["p1_won"]
     X = data.drop(columns=['p1_won'])
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     X_train.reset_index(inplace=True, drop=True)
     y_train.reset_index(inplace=True, drop=True)
@@ -54,10 +54,12 @@ def apply_feature_engineering(data: pd.DataFrame, params: dict[str, str]) -> tup
     X_test.reset_index(inplace=True, drop=True)
     y_test.reset_index(inplace=True, drop=True)
     # Feature engineering
-    feature_engineering_train = FeatureEngineering(X_train, params['categorical_features_dummies'], params['sk_kt_study_list'])
+    feature_engineering_train = FeatureEngineering(X_train, params['categorical_features_dummies'],\
+        params['sk_kt_study_list'], params['categorical_features_target_encoding'], y_train)
     X_train = feature_engineering_train.transform()
 
-    feature_engineering_test = FeatureEngineering(X_test, params['categorical_features_dummies'], params['sk_kt_study_list'])
+    feature_engineering_test = FeatureEngineering(X_test, params['categorical_features_dummies'],\
+        params['sk_kt_study_list'], params['categorical_features_target_encoding'], y_test)
     X_test = feature_engineering_test.transform()
     print(f'\nX_train shape after feature engineering : {X_train.shape}')
     print(f'\nX_test shape after feature engineering : {X_test.shape}')

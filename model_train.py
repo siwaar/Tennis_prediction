@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import KFold, GridSearchCV
-from sklearn.metrics import confusion_matrix, recall_score, precision_score, f1_score, accuracy_score, classification_report
+from sklearn.metrics import confusion_matrix, recall_score, precision_score, f1_score, accuracy_score
 from lightgbm import LGBMClassifier
 from xgboost import XGBClassifier
 
@@ -21,7 +21,7 @@ def train_models(X_train, y_train) -> None:
         if score > best_sc:
             best_sc = score
             best_m = model
-    print(f'Best model based on f1 score :{best_m} with score : {round(best_sc*100,2)} %')
+    print(f'Best model based on f1 score :{best_m}')
     return get_best_model(X_train, y_train, models[best_m])
 
 

@@ -3,18 +3,24 @@ import numpy as np
 
 
 class FeatureEngineering:
-    def __init__(self, data: pd.DataFrame, categorical_features: list[str], sk_kt_cols: list[str]) -> None:
+    def __init__(self, data: pd.DataFrame, categorical_features: list[str], sk_kt_cols: list[str],\
+        categorical_features_target_encoding:list[str], target: pd.DataFrame) -> None:
         self.data = data.copy()
         self.categorical_cols = categorical_features
         self.sk_kt_cols = sk_kt_cols
+        self.categorical_features_target_encoding = categorical_features_target_encoding
+        self.target = target
         
     def _split_date(self) -> None:
         """
         Extract the year, the month and the day from the column tourney date.
         """
+        
         self.data["day"] = self.data["tourney_date"]%100
         self.data["month"] = (self.data["tourney_date"]//100)%100
         self.data["year"] = self.data["tourney_date"]//10000
+        #self.data['day_of_week'] = pd.to_datetime(self.data['tourney_date'].map(lambda x : str(x))).apply(lambda val: val.day_name())
+        #self.categorical_cols.append('day_of_week')
         self.data.drop(columns=["tourney_date"], inplace=True)
     
     def _importance_tourney(self) -> None:
@@ -74,6 +80,53 @@ class FeatureEngineering:
         for p in [1, 2]:    
             self.data[f"p{p}_seed"] = self.data[f"p{p}_seed"].astype(str)
 
+
+    @staticmethod
+    def add_noise(series, noise_level):
+        return series * (1 + noise_level * np.random.randn(len(series)))
+
+    @staticmethod
+    def target_encode(trn_series=None,  
+                    target=None, 
+                    min_samples_leaf=1, 
+                    smoothing=1,
+                    noise_level=0):
+        """
+        Smoothing is computed like in the following paper by Daniele Micci-Barreca
+        https://kaggle2.blob.core.windows.net/forum-message-attachments/225952/7441/high%20cardinality%20categoricals.pdf
+        trn_series : training categorical feature as a pd.Series
+        target : target data as a pd.Series
+        min_samples_leaf (int) : minimum samples to take category average into account
+        smoothing (int) : smoothing effect to balance categorical average vs prior  
+        """ 
+        assert len(trn_series) == len(target)
+        temp = pd.concat([trn_series, target], axis=1)
+        
+        # Compute target mean 
+        averages = temp.groupby(by=trn_series.name)[target.name].agg(["mean", "count"])
+        
+        # Compute smoothing
+        smoothing = 1 / (1 + np.exp(-(averages["count"] - min_samples_leaf) / smoothing))
+        
+        # Apply average function to all target data
+        prior = target.mean()
+        
+        # The bigger the count the less full_avg is taken into account
+        averages[target.name] = prior * (1 - smoothing) + averages["mean"] * smoothing
+        averages.drop(["mean", "count"], axis=1, inplace=True)
+        
+        # Apply averages to trn and tst series
+        ft_trn_series = pd.merge(
+            trn_series.to_frame(trn_series.name),
+            averages.reset_index().rename(columns={'index': target.name, target.name: 'average'}),
+            on=trn_series.name,
+            how='left')['average'].rename(trn_series.name + '_mean').fillna(prior)
+        
+        # pd.merge does not keep the index so restore it
+        ft_trn_series.index = trn_series.index 
+
+        return FeatureEngineering.add_noise(ft_trn_series, noise_level)
+
     def transform(self) -> pd.DataFrame:
         """
         Apply the feature engineering pipeline.
@@ -88,6 +141,14 @@ class FeatureEngineering:
         self._game_per_match()
         # Scale numerical data in order to deal with outliers problem:
         self._log_transform()
+        # Apply target encoding
+        for feature in self.categorical_features_target_encoding:
+            feature_encoded = FeatureEngineering.target_encode(self.data[feature],
+                                target=self.target, 
+                                min_samples_leaf=100,
+                                smoothing=10,
+                                noise_level=0.01)
+            self.data[feature] = feature_encoded
         # Transform seed column as categorical variable
         self._transform_seed_as_categorical()
         # create a dummies variables for categorical data

@@ -12,7 +12,8 @@ class PreProcessing:
         self.features_to_fill_by_new_category = features_to_fill_by_new_category
 
     def preprocess(self) -> pd.DataFrame:
-        
+        """ Drop dupclicated, Apply missing values imputation """
+
         print(f'''\n{'-'*20} Preprocessing data  {'-'*20}''')
         # drop duplicates
         self.data.drop_duplicates(inplace=True)
@@ -28,11 +29,11 @@ class PreProcessing:
         """
         Find columns that contain nan values.
         """
-        nb_lines = self.data.shape[0]
+        nb_rows = len(self.data)
         features_with_nan_values: dict[str, float] = {
-            c: round((1 - self.data[c].count() / self.data.shape[0]) * 100, 2)
+            c: round((1 - self.data[c].count() / nb_rows) * 100, 2)
             for c in self.data.columns
-            if self.data[c].count() < nb_lines
+            if self.data[c].count() < nb_rows
         }
         return {
             k: f'{str(v)}%'
@@ -63,6 +64,7 @@ class PreProcessing:
         ## drop the value of the hand column
         self.data['p1_hand'] = self.data['p1_hand'].fillna('U')
         self.data['p2_hand'] = self.data['p2_hand'].fillna('U')
+
         self.data.reset_index(inplace=True, drop=True)
         
         features_with_nan_values = self._get_columns_with_nan_values()
