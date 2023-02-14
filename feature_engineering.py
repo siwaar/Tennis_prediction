@@ -10,13 +10,13 @@ class FeatureEngineering:
             data (pd.DataFrame): preprocessed data
             params (dict[str, str]): a dictionary containing selected columns for a 
             spacial feature engineering.
-            target (pd.DataFrame): target
+            target (pd.DataFrame): ground truth of the training set
         """
         self.data = data.copy()
         self.categorical_cols = params['categorical_features_dummies']
         self.sk_kt_cols = params['sk_kt_study_list']
         self.categorical_features_target_encoding = params['categorical_features_target_encoding']
-        self.redundant_cols = params["redundant_features"]
+        self.redundant_features = params["redundant_features"]
         self.target = target
         
     def _split_date(self) -> None:
@@ -26,8 +26,10 @@ class FeatureEngineering:
         self.data["day"] = self.data["tourney_date"]%100
         self.data["month"] = (self.data["tourney_date"]//100)%100
         self.data["year"] = self.data["tourney_date"]//10000
-        #self.data['day_of_week'] = pd.to_datetime(self.data['tourney_date'].map(lambda x : str(x))).apply(lambda val: val.day_name())
-        #self.categorical_cols.append('day_of_week')
+        datetime_feature = pd.to_datetime(self.data['tourney_date'].map(lambda x : str(x)))
+        self.data['day_of_week'] = datetime_feature.apply(lambda val: val.day_name())
+        self.categorical_cols.append('day_of_week')
+        self.data['is_weekend'] = datetime_feature.map(lambda x : 1 if x.weekday() >= 5 else 0 )
         self.data.drop(columns=["tourney_date"], inplace=True)
     
     def _importance_tourney(self) -> None:

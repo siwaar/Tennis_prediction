@@ -2,7 +2,7 @@ import pandas as pd
 import json
 
 class PreProcessing:
-    """Deal with nan values, drop useless columns"""
+    """ Deal with nan values, drop useless columns"""
     
     def __init__(self, data: pd.DataFrame, features_to_drop:list[str], features_to_fill_by_median:list[str],\
          features_to_fill_by_new_category:list[str]) -> None:
