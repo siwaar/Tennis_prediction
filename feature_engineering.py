@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from sklearn.preprocessing import RobustScaler
 
 
 class FeatureEngineering:
@@ -14,9 +15,9 @@ class FeatureEngineering:
         """
         self.data = data.copy()
         self.categorical_cols = params['categorical_features_dummies']
-        self.sk_kt_cols = params['sk_kt_study_list']
         self.categorical_features_target_encoding = params['categorical_features_target_encoding']
         self.redundant_features = params["redundant_features"]
+        self.cols_to_scale = params["features_to_scale"]
         self.target = target
         
     def _split_date(self) -> None:
@@ -31,14 +32,6 @@ class FeatureEngineering:
         self.categorical_cols.append('day_of_week')
         self.data['is_weekend'] = datetime_feature.map(lambda x : 1 if x.weekday() >= 5 else 0 )
         self.data.drop(columns=["tourney_date"], inplace=True)
-    
-    def _importance_tourney(self) -> None:
-        """
-        Set A new column which represent the importance of the tourney.
-        """
-        importance_dict = {"G":6, "M": 5, "A": 4, "C": 4, "S": 3, "F" : 2, "D": 1}
-        importance = [importance_dict[k] for k in self.data["tourney_level"].tolist()]
-        self.data["tourney_importance"] = importance
         
     def _sets_per_match(self) -> None:
         """
@@ -71,62 +64,51 @@ class FeatureEngineering:
         """
         self.data = pd.get_dummies(self.data, columns=self.categorical_cols)
         
-    def _log_transform(self) -> None:
-        """
-        Apply log function to normalize numerical columns that need to be transformed
-        """
-        for col in self.sk_kt_cols:
-            try:
-                self.data[f'log_{col}'] = np.log1p(self.data[col])
-            except Exception:
-                self.sk_kt_cols.remove(col)
-        self.data.drop(columns=self.sk_kt_cols, inplace=True)
-
+    def _scale_numerical_features(self) -> None:
+        """ Scale numerical features """
+        features = self.data[self.cols_to_scale]
+        scaler = RobustScaler().fit(features.values)
+        self.data[self.cols_to_scale] = scaler.transform(features.values)
+         
+    
     @staticmethod
     def add_noise(series, noise_level):
         return series * (1 + noise_level * np.random.randn(len(series)))
 
-    @staticmethod
-    def target_encode(trn_series=None,  
-                    target=None, 
-                    min_samples_leaf=1, 
-                    smoothing=1,
-                    noise_level=0):
+    def _target_encode(self, min_samples_leaf, smoothing, noise_level) -> None:
         """
         Smoothing is computed like in the following paper by Daniele Micci-Barreca
         https://kaggle2.blob.core.windows.net/forum-message-attachments/225952/7441/high%20cardinality%20categoricals.pdf
-        trn_series : training categorical feature as a pd.Series
-        target : target data as a pd.Series
         min_samples_leaf (int) : minimum samples to take category average into account
         smoothing (int) : smoothing effect to balance categorical average vs prior  
         """ 
-        assert len(trn_series) == len(target)
-        temp = pd.concat([trn_series, target], axis=1)
-        
-        # Compute target mean 
-        averages = temp.groupby(by=trn_series.name)[target.name].agg(["mean", "count"])
-        
-        # Compute smoothing
-        smoothing = 1 / (1 + np.exp(-(averages["count"] - min_samples_leaf) / smoothing))
-        
-        # Apply average function to all target data
-        prior = target.mean()
-        
-        # The bigger the count the less full_avg is taken into account
-        averages[target.name] = prior * (1 - smoothing) + averages["mean"] * smoothing
-        averages.drop(["mean", "count"], axis=1, inplace=True)
-        
-        # Apply averages to trn and tst series
-        ft_trn_series = pd.merge(
-            trn_series.to_frame(trn_series.name),
-            averages.reset_index().rename(columns={'index': target.name, target.name: 'average'}),
-            on=trn_series.name,
-            how='left')['average'].rename(trn_series.name + '_mean').fillna(prior)
-        
-        # pd.merge does not keep the index so restore it
-        ft_trn_series.index = trn_series.index 
+        for feature in self.categorical_features_target_encoding:
+            temp = pd.concat([self.data[feature], self.target], axis=1)
+            
+            # Compute target mean 
+            averages = temp.groupby(by=self.data[feature].name)[self.target.name].agg(["mean", "count"])
+            
+            # Compute smoothing
+            smoothing = 1 / (1 + np.exp(-(averages["count"] - min_samples_leaf) / smoothing))
+            
+            # Apply average function to all target data
+            prior = self.target.mean()
+            
+            # The bigger the count the less full_avg is taken into account
+            averages[self.target.name] = prior * (1 - smoothing) + averages["mean"] * smoothing
+            averages.drop(["mean", "count"], axis=1, inplace=True)
+            
+            # Apply averages to trn and tst series
+            ft_trn_series = pd.merge(
+                self.data[feature].to_frame(self.data[feature].name),
+                averages.reset_index().rename(columns={'index': self.target.name, self.target.name: 'average'}),
+                on=self.data[feature].name,
+                how='left')['average'].rename(self.data[feature].name + '_mean').fillna(prior)
+            
+            # pd.merge does not keep the index so restore it
+            ft_trn_series.index = self.data[feature].index 
+            self.data[feature] = FeatureEngineering.add_noise(ft_trn_series, noise_level)
 
-        return FeatureEngineering.add_noise(ft_trn_series, noise_level)
 
     def transform(self) -> pd.DataFrame:
         """ Apply the feature engineering pipeline.
@@ -136,25 +118,16 @@ class FeatureEngineering:
         """
         # Add date features : 
         self._split_date()
-        # Add importance tourney feature:
-        self._importance_tourney()
         # Add number of sets per match:
         self._sets_per_match()
         # Add the number of games per match:
         self._game_per_match()
-        # Scale numerical data in order to deal with outliers problem:
-        self._log_transform()
         # Apply target encoding
-        for feature in self.categorical_features_target_encoding:
-            feature_encoded = FeatureEngineering.target_encode(self.data[feature],
-                                target=self.target, 
-                                min_samples_leaf=100,
-                                smoothing=10,
-                                noise_level=0.01)
-            self.data[feature] = feature_encoded
-            
+        self._target_encode(min_samples_leaf=100, smoothing=10, noise_level=0.01)
         # create a dummies variables for categorical data
         self._process_categorical_data()
+        # scale numerical features
+        self._scale_numerical_features()
         # remove redundant features
         self.data.drop(columns=self.redundant_features, inplace=True)
 
