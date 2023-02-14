@@ -42,13 +42,13 @@ class FeatureEngineering:
         
     def _sets_per_match(self) -> None:
         """
-        Get the number of set per match.
+        Get the number of sets per match.
         """
         self.data["nbr_sets"] = [len(match.split()) for match in self.data["score"]]
     
     def _game_per_match(self) -> None:
         """
-        Get the number of game played during a match.
+        Get the number of games played during a match.
         """
         games_during_all_matchs = [[g.split('-') for g in match.split()] for match in self.data["score"]]
 
@@ -81,14 +81,6 @@ class FeatureEngineering:
             except Exception:
                 self.sk_kt_cols.remove(col)
         self.data.drop(columns=self.sk_kt_cols, inplace=True)
-    
-    def _transform_seed_as_categorical(self):
-        """
-        Consider seed as a categorical variable.
-        """
-        for p in [1, 2]:    
-            self.data[f"p{p}_seed"] = self.data[f"p{p}_seed"].astype(str)
-
 
     @staticmethod
     def add_noise(series, noise_level):
@@ -146,9 +138,9 @@ class FeatureEngineering:
         self._split_date()
         # Add importance tourney feature:
         self._importance_tourney()
-        # Add number of set per match:
+        # Add number of sets per match:
         self._sets_per_match()
-        # Add the number of game pet match:
+        # Add the number of games per match:
         self._game_per_match()
         # Scale numerical data in order to deal with outliers problem:
         self._log_transform()
@@ -160,8 +152,7 @@ class FeatureEngineering:
                                 smoothing=10,
                                 noise_level=0.01)
             self.data[feature] = feature_encoded
-        # Transform seed column as categorical variable
-        self._transform_seed_as_categorical()
+            
         # create a dummies variables for categorical data
         self._process_categorical_data()
         # remove redundant features
