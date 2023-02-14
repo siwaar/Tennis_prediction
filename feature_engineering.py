@@ -17,7 +17,6 @@ class FeatureEngineering:
         self.categorical_cols = params['categorical_features_dummies']
         self.categorical_features_target_encoding = params['categorical_features_target_encoding']
         self.redundant_features = params["redundant_features"]
-        self.cols_to_scale = params["features_to_scale"]
         self.target = target
         
     def _split_date(self) -> None:
@@ -64,12 +63,6 @@ class FeatureEngineering:
         """
         self.data = pd.get_dummies(self.data, columns=self.categorical_cols)
         
-    def _scale_numerical_features(self) -> None:
-        """ Scale numerical features """
-        features = self.data[self.cols_to_scale]
-        scaler = RobustScaler().fit(features.values)
-        self.data[self.cols_to_scale] = scaler.transform(features.values)
-         
     
     @staticmethod
     def add_noise(series, noise_level):
@@ -126,8 +119,6 @@ class FeatureEngineering:
         self._target_encode(min_samples_leaf=100, smoothing=10, noise_level=0.01)
         # create a dummies variables for categorical data
         self._process_categorical_data()
-        # scale numerical features
-        self._scale_numerical_features()
         # remove redundant features
         self.data.drop(columns=self.redundant_features, inplace=True)
 
