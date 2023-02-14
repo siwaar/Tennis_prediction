@@ -84,7 +84,7 @@ def score_classifier(dataset, classifier, labels):
     print(f"Accuracy = {accuracy}")
     print(f"f1 score = {f1_sc}")
     print(f"\nConfusion matrix : \n\n {confusion_mat}")
-    print("\n############################\n")
+    print(f"\n{'-'*20}\n")
     return f1_sc
 
 def get_best_model(X_train , y_train, classifier):

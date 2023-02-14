@@ -1,15 +1,17 @@
 import pandas as pd
 
 
-def predict(model, X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.Series):
-    """
-    input:
-        - model : model after tuning hyperparameters
-        - X_train : training set dataframe after feature engineering
-        - y_train : ground truth of the trianing set
-        - X_test : test set dataframe after feature engineering
-    output : 
-        
+def predict(model, X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.Series) -> pd.Series :
+    """ Get prediction on data test using the selected model
+
+    Args:
+        model (_type_): model after tuning hyperparameters
+        X_train (pd.DataFrame): training set dataframe after feature engineering
+        X_test (pd.DataFrame): ground truth of the trianing set
+        y_train (pd.Series): test set dataframe after feature engineering
+
+    Returns:
+        _type_: prediction
     """
     print(f'''\n{'-'*20} Model prediction  {'-'*20}''')
     def intersection(lst1: list[str], lst2: list[str]) -> list[str]:

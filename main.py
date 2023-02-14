@@ -10,8 +10,12 @@ from sklearn.metrics import classification_report
 import pickle
 
 def load_data(data_path: str) -> pd.DataFrame:
-    """
-    Load data
+    """ Load data with the path provided in config.yaml
+    Args:
+        data_path (str): path of data csv
+
+    Returns:
+        pd.DataFrame: loaded data
     """
     # load data :
     print(f''' {'-'*20} Loading data  {'-'*20}''')
@@ -25,10 +29,14 @@ def load_data(data_path: str) -> pd.DataFrame:
 
 def preprocess_data(params: dict[str, str]) -> pd.DataFrame:
     """
-        Load and process data.
-        It takes as parameter a dictionary containing:
+        Load and process data
+
+    Args:
+        params (dict[str, str]): a dictionary containing
         data path and selected columns to deal with the task.
 
+    Returns:
+        pd.DataFrame: preprocessed data
     """
     # Load data
     data = load_data(params['data_csv_path'])
@@ -41,7 +49,15 @@ def preprocess_data(params: dict[str, str]) -> pd.DataFrame:
     return preprocessing.data
 
 def apply_feature_engineering(data: pd.DataFrame, params: dict[str, str]) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series,pd.Series]:
-    """ Apply feature engineering on both train and test data """
+    """Apply feature engineering and split data for training and test
+
+    Args:
+        data (pd.DataFrame): preprocessed data
+        params (dict[str, str]): a dictionary containing selected columns for a spacial feature engineering.
+
+    Returns:
+        tuple[pd.DataFrame, pd.DataFrame, pd.Series,pd.Series]: X_train, X_test, y_train, y_test
+    """
 
     print(f'''\n{'-'*20} Feature Engineering  {'-'*20}''')
     y = data["p1_won"]
@@ -54,22 +70,12 @@ def apply_feature_engineering(data: pd.DataFrame, params: dict[str, str]) -> tup
     X_test.reset_index(inplace=True, drop=True)
     y_test.reset_index(inplace=True, drop=True)
     # Feature engineering
-    feature_engineering_train = FeatureEngineering(X_train, params['categorical_features_dummies'],\
-        params['sk_kt_study_list'], params['categorical_features_target_encoding'], y_train)
+    feature_engineering_train = FeatureEngineering(X_train, params, y_train)
     X_train = feature_engineering_train.transform()
-
-    feature_engineering_test = FeatureEngineering(X_test, params['categorical_features_dummies'],\
-        params['sk_kt_study_list'], params['categorical_features_target_encoding'], y_test)
-    X_test = feature_engineering_test.transform()
     print(f'\nX_train shape after feature engineering : {X_train.shape}')
+    feature_engineering_test = FeatureEngineering(X_test, params, y_test)
+    X_test = feature_engineering_test.transform()
     print(f'\nX_test shape after feature engineering : {X_test.shape}')
-
-    X_train.drop(columns=params["redundant_features"], inplace=True)
-    X_test.drop(columns=params["redundant_features"], inplace=True)
-
-    print(f'\nX_train shape after removing redundant features : {X_train.shape}')
-    print(f'\nX_test shape after removing redundant features : {X_test.shape}')
-    
     return X_train, X_test, y_train, y_test
 
 

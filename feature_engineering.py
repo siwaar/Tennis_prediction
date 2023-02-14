@@ -3,17 +3,24 @@ import numpy as np
 
 
 class FeatureEngineering:
-    def __init__(self, data: pd.DataFrame, categorical_features: list[str], sk_kt_cols: list[str],\
-        categorical_features_target_encoding:list[str], target: pd.DataFrame) -> None:
+    def __init__(self, data: pd.DataFrame, params: dict[str, str], target: pd.DataFrame) -> None:
+        """ Apply feature engineering 
+
+        Args:
+            data (pd.DataFrame): preprocessed data
+            params (dict[str, str]): a dictionary containing selected columns for a 
+            spacial feature engineering.
+            target (pd.DataFrame): target
+        """
         self.data = data.copy()
-        self.categorical_cols = categorical_features
-        self.sk_kt_cols = sk_kt_cols
-        self.categorical_features_target_encoding = categorical_features_target_encoding
+        self.categorical_cols = params['categorical_features_dummies']
+        self.sk_kt_cols = params['sk_kt_study_list']
+        self.categorical_features_target_encoding = params['categorical_features_target_encoding']
+        self.redundant_cols = params["redundant_features"]
         self.target = target
         
     def _split_date(self) -> None:
-        """
-        Extract the year, the month and the day from the column tourney date.
+        """  Extract the year, the month and the day from the column tourney date.
         """
         
         self.data["day"] = self.data["tourney_date"]%100
@@ -128,8 +135,10 @@ class FeatureEngineering:
         return FeatureEngineering.add_noise(ft_trn_series, noise_level)
 
     def transform(self) -> pd.DataFrame:
-        """
-        Apply the feature engineering pipeline.
+        """ Apply the feature engineering pipeline.
+
+        Returns:
+            pd.DataFrame: processed data
         """
         # Add date features : 
         self._split_date()
@@ -153,4 +162,7 @@ class FeatureEngineering:
         self._transform_seed_as_categorical()
         # create a dummies variables for categorical data
         self._process_categorical_data()
+        # remove redundant features
+        self.data.drop(columns=self.redundant_features, inplace=True)
+
         return self.data
