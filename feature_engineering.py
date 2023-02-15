@@ -16,20 +16,18 @@ class FeatureEngineering:
         self.data = data.copy()
         self.categorical_cols = params['categorical_features_dummies']
         self.categorical_features_target_encoding = params['categorical_features_target_encoding']
-        self.redundant_features = params["redundant_features"]
         self.target = target
         
     def _split_date(self) -> None:
         """  Extract the year, the month and the day from the column tourney date.
         """
         
-        self.data["day"] = self.data["tourney_date"]%100
-        self.data["month"] = (self.data["tourney_date"]//100)%100
-        self.data["year"] = self.data["tourney_date"]//10000
-        datetime_feature = pd.to_datetime(self.data['tourney_date'].map(lambda x : str(x)))
-        self.data['day_of_week'] = datetime_feature.apply(lambda val: val.day_name())
+        self.data["day"] = self.data["tourney_date"].map(lambda x: x.day)
+        self.data["month"] = self.data["tourney_date"].map(lambda x: x.month)
+        self.data["year"] = self.data["tourney_date"].map(lambda x: x.year)
+        self.data['day_of_week'] = self.data["tourney_date"].map(lambda val: val.day_name())
         self.categorical_cols.append('day_of_week')
-        self.data['is_weekend'] = datetime_feature.map(lambda x : 1 if x.weekday() >= 5 else 0 )
+        self.data['is_weekend'] = self.data["tourney_date"].map(lambda x : 1 if x.weekday() >= 5 else 0 )
         self.data.drop(columns=["tourney_date"], inplace=True)
         
     def _sets_per_match(self) -> None:
@@ -119,7 +117,5 @@ class FeatureEngineering:
         self._target_encode(min_samples_leaf=100, smoothing=10, noise_level=0.01)
         # create a dummies variables for categorical data
         self._process_categorical_data()
-        # remove redundant features
-        self.data.drop(columns=self.redundant_features, inplace=True)
 
         return self.data

@@ -4,7 +4,7 @@ from feature_engineering import FeatureEngineering
 from model_predict import predict
 from model_train import train_models
 from preprocess import PreProcessing
-from sklearn.model_selection import train_test_split
+import datetime
 
 from sklearn.metrics import classification_report
 import pickle
@@ -60,9 +60,18 @@ def apply_feature_engineering(data: pd.DataFrame, params: dict[str, str]) -> tup
     """
 
     print(f'''\n{'-'*20} Feature Engineering  {'-'*20}''')
-    y = data["p1_won"]
-    X = data.drop(columns=['p1_won'])
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    #y = data["p1_won"]
+    #X = data.drop(columns=['p1_won'])
+    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    data['tourney_date'] = pd.to_datetime(data['tourney_date'], format="%Y%m%d")
+    train_df = data[data['tourney_date'] < '2018-05-01']
+    test_df = data[data['tourney_date'] >= '2018-05-01']
+    
+    X_train = train_df.drop(columns=['p1_won'])
+    X_test = test_df.drop(columns=['p1_won'])
+    y_train = train_df["p1_won"]
+    y_test = test_df["p1_won"]
+    
 
     X_train.reset_index(inplace=True, drop=True)
     y_train.reset_index(inplace=True, drop=True)
