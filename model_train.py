@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import KFold, GridSearchCV
+from sklearn.model_selection import KFold, GridSearchCV, TimeSeriesSplit
 from sklearn.metrics import confusion_matrix, recall_score, precision_score, f1_score, accuracy_score
 from lightgbm import LGBMClassifier
 from xgboost import XGBClassifier
@@ -25,8 +25,7 @@ def train_models(X_train, y_train) -> None:
     return get_best_model(X_train, y_train, models[best_m])
 
 
-def score_classifier(dataset, classifier, labels):
-    
+def score_classifier(features_set: pd.DataFrame, classifier, labels: pd.Series) -> float:
     """
     Performs 3 random trainings/tests to build a confusion matrix and prints results with precision and recall scores
     Inputs :
@@ -35,43 +34,42 @@ def score_classifier(dataset, classifier, labels):
         - labels : the labels used for training and validation
     :return:
     """
+    
     n_splits = 3
-    kf = KFold(n_splits=n_splits, random_state=50, shuffle=True)
+    tscv = TimeSeriesSplit(n_splits)
     confusion_matrices = []
     recalls = []
     precisions = []
     accuracies = []
     f1_scores = []
-    
-    for training_ids, test_ids in kf.split(dataset):
-        
-        if type(dataset) == pd.DataFrame:
-            
-            training_set = dataset.loc[training_ids]
-            training_labels = labels.loc[training_ids]
+    fold = 0
+    # Sort train data by date
+    dataset= features_set.copy()
+    dataset['date'] = pd.to_datetime(dataset[['year', 'month', 'day']])
+    dataset = dataset.sort_values('date')
 
-            test_set = dataset.loc[test_ids]
-            test_labels = labels.loc[test_ids]
-            
-        elif type(dataset) == np.ndarray: 
-            
-            training_set = dataset[training_ids]
-            training_labels = labels[training_ids]
+    # Iterate through each split
+    for train_index, test_index in tscv.split(dataset):
+        
+        cv_train_set, cv_test_set = dataset.iloc[train_index], dataset.iloc[test_index]
+        cv_train_label, cv_test_label = labels.iloc[train_index], labels.iloc[test_index]
 
-            test_set = dataset[test_ids]
-            test_labels = labels[test_ids]
-            
-        
-        classifier.fit(training_set, training_labels)
-        
-        predicted_labels = classifier.predict(test_set)
-        
-        confusion_matrices.append(confusion_matrix(test_labels, predicted_labels))
-        recalls.append(recall_score(test_labels, predicted_labels))
-        precisions.append(precision_score(test_labels, predicted_labels))
-        f1_scores.append(f1_score(test_labels, predicted_labels))
-        accuracies.append(accuracy_score(test_labels, predicted_labels))
     
+        print('Fold :', fold)
+        print('Train date range: from {} to {}'.format(cv_train_set.date.min(), cv_train_set.date.max()))
+        print('Test date range: from {} to {}\n'.format(cv_test_set.date.min(), cv_test_set.date.max()))
+        fold += 1
+        cv_train_set.drop(columns=['date'], inplace=True)
+        cv_test_set.drop(columns=['date'], inplace=True)
+        classifier.fit(cv_train_set, cv_train_label)
+        
+        predicted_labels = classifier.predict(cv_test_set)
+        
+        confusion_matrices.append(confusion_matrix(cv_test_label, predicted_labels))
+        recalls.append(recall_score(cv_test_label, predicted_labels))
+        precisions.append(precision_score(cv_test_label, predicted_labels))
+        f1_scores.append(f1_score(cv_test_label, predicted_labels))
+        accuracies.append(accuracy_score(cv_test_label, predicted_labels))
     
     recall = np.mean(recalls) 
     precision = np.mean(precisions)
@@ -88,6 +86,13 @@ def score_classifier(dataset, classifier, labels):
     return f1_sc
 
 def get_best_model(X_train , y_train, classifier):
+    n_splits = 3
+    tscv = TimeSeriesSplit(n_splits)
+    X_train= X_train.copy()
+    X_train['date'] = pd.to_datetime(X_train[['year', 'month', 'day']])
+    X_train = X_train.sort_values('date')
+    X_train.drop(columns=['date'], inplace=True)
+
     clf = GridSearchCV(
             estimator=classifier(),
             param_grid={'num_leaves': (15, 30, 45),
@@ -96,7 +101,7 @@ def get_best_model(X_train , y_train, classifier):
                         'n_estimators': (25, 50, 100, 200)
                         },
             scoring='f1',
-            cv=3,
+            cv=tscv,
             n_jobs=3,
             verbose=1,
             refit=True)

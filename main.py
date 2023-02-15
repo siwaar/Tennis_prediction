@@ -4,7 +4,7 @@ from feature_engineering import FeatureEngineering
 from model_predict import predict
 from model_train import train_models
 from preprocess import PreProcessing
-import datetime
+
 
 from sklearn.metrics import classification_report
 import pickle
