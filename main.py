@@ -1,11 +1,9 @@
 from ruamel.yaml import YAML
 import pandas as pd
-from feature_engineering import FeatureEngineering
+from encoder import FeaturesEncoder
 from model_predict import predict
 from model_train import train_models
 from preprocess import PreProcessing
-
-
 from sklearn.metrics import classification_report
 import pickle
 
@@ -27,64 +25,33 @@ def load_data(data_path: str) -> pd.DataFrame:
         raise "No data found with the path provided in config.yaml" from e
 
 
-def preprocess_data(params: dict[str, str]) -> pd.DataFrame:
-    """
-        Load and process data
-
-    Args:
-        params (dict[str, str]): a dictionary containing
-        data path and selected columns to deal with the task.
-
-    Returns:
-        pd.DataFrame: preprocessed data
-    """
-    # Load data
-    data = load_data(params['data_csv_path'])
-    # Preprocess data
-    preprocessing = PreProcessing(data, params['features_to_drop'],  \
-        params['features_to_fill_by_median'], params['features_to_fill_by_new_category'])
-    preprocessing.preprocess()
-    print(f'\nData shape after preprocessing : {preprocessing.data.shape}')
-
-    return preprocessing.data
-
-def apply_feature_engineering(data: pd.DataFrame, params: dict[str, str]) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series,pd.Series]:
-    """Apply feature engineering and split data for training and test
+def train_test_split_per_time(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series,pd.Series]:
+    """split data for training and test
 
     Args:
         data (pd.DataFrame): preprocessed data
-        params (dict[str, str]): a dictionary containing selected columns for a spacial feature engineering.
-
     Returns:
         tuple[pd.DataFrame, pd.DataFrame, pd.Series,pd.Series]: X_train, X_test, y_train, y_test
     """
 
     print(f'''\n{'-'*20} Feature Engineering  {'-'*20}''')
-    #y = data["p1_won"]
-    #X = data.drop(columns=['p1_won'])
-    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    data['tourney_date'] = pd.to_datetime(data['tourney_date'], format="%Y%m%d")
+    print(f'\nSplit Data into train and test data :')
     train_df = data[data['tourney_date'] < '2018-05-01']
     test_df = data[data['tourney_date'] >= '2018-05-01']
+    print(f'\nData Train shape : {train_df.shape}, from {min(train_df["tourney_date"])} to {max(train_df["tourney_date"])}')
+    print(f'\nData Test shape : {test_df.shape}, from {min(test_df["tourney_date"])} to {max(test_df["tourney_date"])}')
     
-    X_train = train_df.drop(columns=['p1_won'])
-    X_test = test_df.drop(columns=['p1_won'])
+    # Target
+    X_train = train_df.drop(columns=['p1_won', 'tourney_date'])
     y_train = train_df["p1_won"]
+    X_test = test_df.drop(columns=['p1_won', 'tourney_date'])
     y_test = test_df["p1_won"]
-    
-
+    # reset_index
     X_train.reset_index(inplace=True, drop=True)
     y_train.reset_index(inplace=True, drop=True)
-
     X_test.reset_index(inplace=True, drop=True)
     y_test.reset_index(inplace=True, drop=True)
-    # Feature engineering
-    feature_engineering_train = FeatureEngineering(X_train, params, y_train)
-    X_train = feature_engineering_train.transform()
-    print(f'\nX_train shape after feature engineering : {X_train.shape}')
-    feature_engineering_test = FeatureEngineering(X_test, params, y_test)
-    X_test = feature_engineering_test.transform()
-    print(f'\nX_test shape after feature engineering : {X_test.shape}')
+
     return X_train, X_test, y_train, y_test
 
 
@@ -97,16 +64,28 @@ def main():
     with open(config_path) as f:
         params = yaml.load(f)
     
-    # Load and preprocess data 
-    data = preprocess_data(params)
-    # Feature Engineering
-    X_train, X_test, y_train, y_test = apply_feature_engineering(data, params)
-    # Train and choose the best model
-    best_model = train_models(X_train, y_train)
+    data = load_data(params['data_csv_path'])
+    preprocessor = PreProcessing(data, params['features_to_drop'],  \
+    params['features_to_fill_by_median'], params['features_to_remove_nan_values'])
+    preprocessor.preprocess()
+    # split data
+    X_train, X_test, y_train, y_test = train_test_split_per_time(preprocessor.data)
+    # Encoding
+    feature_encoder = FeaturesEncoder(params)
+    # OneHotEnconder
+    ohe = feature_encoder.get_onehot_encoder(X_train)
+    encoded_oh_X_train = feature_encoder.transfrom_with_ohe(X_train, ohe)
+    encoded_oh_X_test = feature_encoder.transfrom_with_ohe(X_test, ohe)
+    # Target Encoder
+    target_encoder_params = feature_encoder.get_target_encoder_params(X_train, y_train)
+    encoded_X_train = feature_encoder.transform_with_target_encoder(encoded_oh_X_train, target_encoder_params)
+    encoded_X_test = feature_encoder.transform_with_target_encoder(encoded_oh_X_test, target_encoder_params)
+    # Train and choose the best parameters for the model
+    best_model = train_models(encoded_X_train, y_train)
     # Save model
     pickle.dump(best_model, open(params['model_path']+'lightGBM_model.pkl', 'wb'))
     # Prediction
-    y_pred = predict(best_model, X_train, X_test, y_train)
+    y_pred = predict(best_model, encoded_X_train, encoded_X_test, y_train)
     print(classification_report(y_test, y_pred))
 
     
