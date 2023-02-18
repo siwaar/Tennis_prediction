@@ -46,7 +46,8 @@ python code_inference.py
 
 You will find predictions of our model in : `predictions/predictions.csv`
 
-## Build Docker Image
+## Deploy web service and web application using docker
+
 First of all, we need to have docker installed on our machine:[link to install Docker](https://docs.docker.com/engine/install/)
 To build docker image, we need to run :
 ```
@@ -57,7 +58,14 @@ To launch docker container, we need to run :
 ```
 docker run -d -p 5000:5000 tennis-docker
 ```
+## Run web application with python
+We need to go to the root directory of the project and execute the following command :
+```
+$ python3 app.py
+```
 
+## Access to web application
+Browse http://localhost:5000/atp_winner
 ## Models used
 We first used different methods to get the encoding and add new features and then we used LightGBM model to predict the winner of a tennis match.
 You will find more documentation of the choice of different models in : `documentation`
