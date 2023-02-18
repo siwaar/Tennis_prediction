@@ -17,7 +17,7 @@ class ATPWinnerPredict(object):
         with open(config_path) as f:
             params = yaml.load(f)
 
-        data = load_data(params['data_csv_path'])
+        data = load_data(params['data_to_predict_csv_path'])
         
         preprocessor = PreProcessing(data, params['features_to_drop'],  \
         params['features_to_fill_by_median'], params['features_to_remove_nan_values'])

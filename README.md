@@ -1,14 +1,16 @@
-# Instructions
+# ATP Little Big Code Use Case
+## Author : Siwar ABBES
+## Purpose : Conduct a Data Science study on the ATP dataset to predict the winner of matches.
 
-## How to run the code :
-All information and parameters need to be specified in the config file.
+## Setting :
+All information and parameters need to be specified in the config file : "config.yaml"
 
 You have to specify the following parameters:
 
-- data_csv_path : the path for the data set 
+- `data_csv_path` : The path for the dataset to train and test the model, example : 'data/ATP_tweaked.csv'
+- `data_to_predict_csv_path` : The path for the new datatset to predict, example : 'data/data_to_predict.csv'
 
-
-### Install environment
+## Requirements :
 
 ```
 python3 -m venv tennis_env

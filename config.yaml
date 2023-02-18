@@ -1,5 +1,5 @@
 data_csv_path : 'data/ATP_tweaked.csv'
-data_test_csv_path : 'data/data_test.csv'
+data_to_predict_csv_path : 'data/data_to_predict.csv'
 predictions_csv_path : 'predictions/predictions.csv'
 onehot_encoder_path : 'model/onehot_encoder.pkl'
 target_encoder_path : 'model/target_encoder.pkl'
