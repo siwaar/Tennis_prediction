@@ -4,17 +4,27 @@ from sklearn.preprocessing import OneHotEncoder
 
 
 class OHEncoder:
+    """ Encoding with OneHot Encoding for low cardinality categorical features """
     def __init__(self, low_cardinality_categorical_features: list[str]) -> None:
-        
         self.low_cardinality_categorical_features = low_cardinality_categorical_features
         
     def get_onehot_encoder(self, X_train: pd.DataFrame):
+        """ Create OneHot encoder and fit it with data train """
         oh_encoder = OneHotEncoder(handle_unknown='ignore', sparse=False)
         oh_encoder.fit(X_train[self.low_cardinality_categorical_features])
         print(f'\nNew columns after encoding low cardinality categorical features with OneHotEncoder : {oh_encoder.get_feature_names_out()}')
         return oh_encoder
     
-    def transfrom_with_ohe(self, X:pd.DataFrame, oh_encoder) -> pd.DataFrame:
+    def transfrom_with_ohe(self, X : pd.DataFrame, oh_encoder) -> pd.DataFrame:
+        """ Transform data X using the onehot encoder oh_encoder
+
+        Args:
+            X (pd.DataFrame): data to be encoded
+            oh_encoder (_type_): one hot encoder
+
+        Returns:
+            pd.DataFrame: encoded data
+        """
         transformed_X = pd.DataFrame(oh_encoder.transform(X[self.low_cardinality_categorical_features]))
         transformed_X.columns = oh_encoder.get_feature_names_out()
         # One-hot encoding removed index; put it back
@@ -24,12 +34,21 @@ class OHEncoder:
         return pd.concat([other_X_cols, transformed_X], axis=1)
 
 class TargetEncoder:
+    """ Encoding with Traget Encoding for high cardinality categorical features """
     def __init__(self) -> None:
         pass
 
-    def get_target_encoder_params(self, X_train: pd.DataFrame, y_train, \
-        high_cardinality_categorical_features: list[str]):
+    def get_target_encoder_params(self, X_train: pd.DataFrame, y_train : pd.Series, \
+        high_cardinality_categorical_features: list[str]) -> dict[str, tuple[pd.DataFrame, float]]:
+        """ Get parameters of the target encoder after fit with train set
 
+        Args:
+            X_train (pd.DataFrame): data train
+            y_train (pd.Series): target
+
+        Returns:
+            _type_: parameters of target encoder
+        """
         encoder_params : dict[str, tuple] = {}
         for feature in high_cardinality_categorical_features:
             averages, prior = TargetEncoder.get_target_encoder_parameters_per_feature(trn_series=X_train[feature], 
@@ -40,15 +59,24 @@ class TargetEncoder:
         return encoder_params
 
     @staticmethod
-    def transform_with_target_encoder(X:pd.DataFrame, encoder_params)-> pd.DataFrame:
+    def transform_with_target_encoder(X : pd.DataFrame, \
+        encoder_params : dict[str, tuple[pd.DataFrame, float]])-> pd.DataFrame:
+        """ Transform data with target encoder 
 
+        Args:
+            X (pd.DataFrame): data to be transformed
+            encoder_params (_type_): parameters of encoder
+
+        Returns:
+            pd.DataFrame: transformed data
+        """
         for feature, (averages, prior) in encoder_params.items():
             X[feature] = TargetEncoder.target_encode_one_feature(X[feature], averages, prior)
 
         return X
 
     @staticmethod
-    def add_noise(series):
+    def add_noise(series : pd.Series) -> pd.Series :
         noise_level = 0.01
         return series * (1 + noise_level * np.random.randn(len(series)))
 
@@ -56,7 +84,7 @@ class TargetEncoder:
     def get_target_encoder_parameters_per_feature(trn_series=None,  
                     target=None, 
                     min_samples_leaf=1, 
-                    smoothing=1):
+                    smoothing=1) -> tuple[pd.DataFrame, float]:
 
         temp = pd.concat([trn_series, target], axis=1)
         
@@ -76,8 +104,8 @@ class TargetEncoder:
         return averages, prior
 
     @staticmethod
-    def target_encode_one_feature(X, averages, prior):
-
+    def target_encode_one_feature(X : pd.DataFrame, averages : pd.DataFrame, prior: float) -> pd.Series:
+        """ Transform one feature with Target Encoder"""
         # Apply averages 
         ft_X= pd.merge(
             X.to_frame(X.name),

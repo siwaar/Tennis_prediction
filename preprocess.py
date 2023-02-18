@@ -3,7 +3,7 @@ import json
 
 
 class PreProcessing:
-    """ Deal with nan values, drop useless columns"""
+    """ Deal with missing values, drop useless columns and apply feature engineering"""
     
     def __init__(self, data: pd.DataFrame, features_to_drop:list[str], features_to_fill_by_median:list[str],\
          features_to_remove_nan_values:list[str]) -> None:
@@ -12,8 +12,16 @@ class PreProcessing:
         self.features_to_fill_by_median = features_to_fill_by_median
         self.features_to_remove_nan_values = features_to_remove_nan_values
 
-    def preprocess(self) -> pd.DataFrame:
-        """ Drop dupclicated, Apply missing values imputation """
+    def preprocess(self, is_for_train: bool=False) -> pd.DataFrame:
+        """ Drop dupclicated, Apply missing values imputation
+
+        Args:
+            is_for_train (bool): drop rows with missing values for important features.
+            Defaults to False.
+
+        Returns:
+            pd.DataFrame: preprocessed data
+        """
 
         print(f'''\n{'-'*20} Preprocessing data  {'-'*20}''')
         # drop duplicates
@@ -23,11 +31,11 @@ class PreProcessing:
         print(f'Drop redundant features, features with more than 80% missing values and features which cannot be known in advance of the match: {self.features_to_drop}')
         self.data.drop(columns=self.features_to_drop, axis=1, inplace=True)
         # fill nan values
-        self._fill_nan_values()
+        self._fill_nan_values(is_for_train)
         print('\nSplit Date into Year, Month and Day and extract new feature "is_weekend"')
         self._split_date()
         print(f'\nData shape after cleaning and preprocessing : {self.data.shape}')
-        print(f"\nremained features : {list(self.data.columns)}")
+        print(f"\nRemained features : {list(self.data.columns)}")
         return self.data
         
 
@@ -42,7 +50,6 @@ class PreProcessing:
             if self.data[c].count() < nb_rows :
                 features_with_nan_values[c] = round((1 - self.data[c].count() / nb_rows) * 100, 2)
            
-        
         features_with_nan_values = {
             k: f'{str(v)}%'
             for k, v in sorted(
@@ -54,8 +61,13 @@ class PreProcessing:
         print(f'\nFeatures with missing values : {json.dumps(features_with_nan_values, indent = 4)}')   
         return None
  
-    def _fill_nan_values(self) -> None:
-        """  Fill nan values """
+    def _fill_nan_values(self, is_for_train: bool=False) -> None:
+        """ Impute missing values
+
+        Args:
+            is_for_train (bool): drop rows with missing values for important features
+            Defaults to False.
+        """
         self.data.replace(to_replace=['None'], value=None, inplace=True)
         self._display_columns_with_nan_values()
 
@@ -73,8 +85,9 @@ class PreProcessing:
         self.data['p2_hand'] = self.data['p2_hand'].fillna('U')
         self.data.reset_index(inplace=True, drop=True)
 
-        # remove empty rows for important features 
-        # self.data.dropna(how='any',inplace=True) 
+        # remove empty rows for important features in train set
+        if is_for_train:
+            self.data.dropna(how='any',inplace=True) 
 
         self._display_columns_with_nan_values()
         return None
@@ -86,7 +99,7 @@ class PreProcessing:
         self.data["day"] = self.data["tourney_date"].map(lambda x: x.day)
         self.data["month"] = self.data["tourney_date"].map(lambda x: x.month)
         self.data["year"] = self.data["tourney_date"].map(lambda x: x.year)
-        self.data['is_weekend'] = self.data["tourney_date"].map(lambda x : 1 if x.weekday() >= 5 else 0 )
+        self.data['is_weekend'] = self.data["tourney_date"].map(lambda x : 1 if x.weekday() >= 5 else 0)
         return
 
 

@@ -60,7 +60,7 @@ def predict():
 
 @app.route("/atp_winner", methods=['POST','GET'])
 def predict_interface():
-    # sourcery skip: identity-comprehension, list-comprehension, move-assign-in-block, use-fstring-for-formatting
+    # sourcery skip: for-append-to-extend, identity-comprehension, list-comprehension, move-assign-in-block, simplify-generator, use-fstring-for-formatting
     if request.method == 'POST':
         values = []
         result = request.form

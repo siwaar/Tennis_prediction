@@ -21,7 +21,7 @@ def main() -> None:
     # Preprocessing
     preprocessor = PreProcessing(data, params['features_to_drop'],  \
     params['features_to_fill_by_median'], params['features_to_remove_nan_values'])
-    preprocessor.preprocess()
+    preprocessor.preprocess(is_for_train=True)
     
     # split data and take into consideration time feature
     X_train, X_test, y_train, y_test = train_test_split_per_time(preprocessor.data)
