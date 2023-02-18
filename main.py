@@ -1,7 +1,7 @@
 from ruamel.yaml import YAML
 from encoder import OHEncoder, TargetEncoder
 from preprocess import PreProcessing
-from utils import load_data, train_test_split_per_time
+from utils import load_data, train_test_split_per_time, display_classification_result
 from sklearn.metrics import classification_report
 import pickle
 from train_model import train_models
@@ -53,7 +53,7 @@ def main() -> None:
     
     # prediction
     y_pred = best_model.predict(encoded_X_test)
-    print(classification_report(y_test, y_pred))
+    display_classification_result(y_test, y_pred)
 
 
 if __name__ == "__main__":

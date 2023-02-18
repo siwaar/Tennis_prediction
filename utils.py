@@ -1,5 +1,6 @@
 import pandas as pd 
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix, classification_report, accuracy_score, precision_score, recall_score, f1_score
 
 def load_data(data_path: str) -> pd.DataFrame:
     """ Load data with the path provided in config.yaml
@@ -49,3 +50,18 @@ def train_test_split_per_time(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.Data
     y_test.reset_index(inplace=True, drop=True)
     
     return X_train, X_test, y_train, y_test
+
+def display_classification_result(y_true, y_pred):
+    """
+    Display evaluation metrics 
+    """
+
+    metrics = ["Accuracy", "Precision", "Recall", "F1-Score"]
+
+    acc = accuracy_score(y_true, y_pred)
+    pre = precision_score(y_true, y_pred)
+    rec = recall_score(y_true, y_pred)
+    f1s = f1_score(y_true, y_pred)
+    report = (acc, pre, rec, f1s)
+    reports = [report]
+    print(f'{pd.DataFrame.from_records(reports, columns=metrics)}')
