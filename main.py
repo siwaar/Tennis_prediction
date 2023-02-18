@@ -26,10 +26,8 @@ def main():
     # split data
     X_train, X_test, y_train, y_test = train_test_split_per_time(preprocessor.data)
     
-    # Encoding
-    oh_encoder = OHEncoder(params['low_cardinality_categorical_features'])
-    
     # OneHotEnconder
+    oh_encoder = OHEncoder(params['low_cardinality_categorical_features'])
     ohe = oh_encoder.get_onehot_encoder(X_train)
     
     # save onehot encoder

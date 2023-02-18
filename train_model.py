@@ -31,6 +31,4 @@ def train_models(X_train , y_train) :
     print(f"Best parameters {model_tuned.best_params_}")
     best_model = model(**model_tuned.best_params_)
     best_model.fit(X_train, y_train)
-    return best_model
-
-    
+    return best_model   

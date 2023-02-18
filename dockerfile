@@ -1,4 +1,4 @@
-FROM Python
+FROM python
 
 WORKDIR /root/
 COPY . /root/
