@@ -1,6 +1,23 @@
 import pandas as pd
 import json
 
+def load_data(data_path: str) -> pd.DataFrame:
+    """ Load data with the path provided in config.yaml
+    Args:
+        data_path (str): path of data csv
+
+    Returns:
+        pd.DataFrame: loaded data
+    """
+    # load data :
+    print(f''' {'-'*20} Loading data  {'-'*20}''')
+    try:
+        data = pd.read_csv(data_path, sep = ';')
+        print('Data shape : ', data.shape)
+        return data
+    except Exception as e:
+        raise "No data found with the path provided in config.yaml" from e
+        
 class PreProcessing:
     """ Deal with nan values, drop useless columns"""
     
