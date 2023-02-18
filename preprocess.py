@@ -93,8 +93,7 @@ class PreProcessing:
         return None
     
     def _split_date(self) -> None:
-        """  Extract the year, the month and the day from the column tourney date.
-        """
+        """  Extract the year, the month and the day from the column tourney date. """
         self.data['tourney_date'] = pd.to_datetime(self.data['tourney_date'], format="%Y%m%d")
         self.data["day"] = self.data["tourney_date"].map(lambda x: x.day)
         self.data["month"] = self.data["tourney_date"].map(lambda x: x.month)

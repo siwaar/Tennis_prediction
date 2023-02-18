@@ -6,6 +6,7 @@ from sklearn.metrics import classification_report
 import pickle
 from train_model import train_models
 
+
 def main() -> None:
     """ Preprocess data, train and evaluate classification model """
 

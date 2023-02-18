@@ -55,13 +55,13 @@ docker build -t tennis-docker .
 
 To launch docker container, we need to run :
 ```
-docker run -d -p 8080:8080 tennis-docker
+docker run -d -p 5000:5000 tennis-docker
 ```
 
 ## Models used
 We first used different methods to get the encoding and add new features and then we used LightGBM model to predict the winner of a tennis match.
 You will find more documentation of the choice of different models in : `documentation`
-You will find trained models in the folder : `models`
+You will find trained model and encoders in the folder : `models`
 
 ## Project description
 This ML project is a supervised binary classification where our target feature called `p1_won` can have 2 values :

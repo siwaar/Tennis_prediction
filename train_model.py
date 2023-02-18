@@ -1,18 +1,34 @@
+from time import time
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
 from lightgbm import LGBMClassifier
+import pandas as pd
+import random
+random.seed(42)
 
 
-def train_models(X_train , y_train) :
-    """ Train and finetune model  """
+def train_models(X_train : pd.DataFrame , y_train: pd.DataFrame) -> LGBMClassifier:
+    """ Train and finetune model
 
-    print(f'''\n{'-'*20} Train LightGBM model  {'-'*20}''')
+        Args:
+            X_train (pd.DataFrame): Data Train
+            y_train (pd.DataFrame): Data target
+
+        Returns:
+            LGBMClassifier: trained and fine tuned model
+    """  
+
+    print(f'''\n{'-'*20} Train LightGBM model with default hyperparameters {'-'*20}''')
     model = LGBMClassifier
+    start_train = time()
     model().fit(X_train, y_train)
-    
-    print(f'''\n{'-'*20} Finetune LightGBM model  {'-'*20}''')
+    end_train = time()
+    print(f'''\nLightGBM was trained during : {end_train - start_train} sec''')
+
+    # Fine Tunning 
+    print(f'''\n{'-'*20} Finetune model with Time Series Cross Validation {'-'*20}''')
     n_splits = 3
     tscv = TimeSeriesSplit(n_splits)
-    model_tuned = GridSearchCV(
+    cv = GridSearchCV(
             estimator=model(),
             param_grid={'num_leaves': (15, 31, 45),
                         'max_depth': (-1, 5, 10),
@@ -26,9 +42,9 @@ def train_models(X_train , y_train) :
             refit=True
             )
 
-    model_tuned.fit(X_train,y_train)
-    # printing the best parameters
-    print(f"Best parameters {model_tuned.best_params_}")
-    best_model = model(**model_tuned.best_params_)
+    cv.fit(X_train,y_train)
+    print(f"\nBest parameters : {cv.best_params_}")
+    best_model = model(**cv.best_params_)
+    print(f"\nTrain LightGBM model with best parameters : {cv.best_params_}")
     best_model.fit(X_train, y_train)
     return best_model   
