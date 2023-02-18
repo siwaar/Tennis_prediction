@@ -1,6 +1,7 @@
-# ATP Little Big Code Use Case
-## Author : Siwar ABBES
-## Purpose : Conduct a Data Science study on the ATP dataset to predict the winner of matches.
+# ATP Little Big Code Use Case : 
+## Conduct a Data Science study on the ATP dataset to predict the winner of matches.
+Author : Siwar ABBES
+
 
 ## Setting :
 All information and parameters need to be specified in the config file : "config.yaml"
