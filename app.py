@@ -5,14 +5,11 @@ import pandas as pd
 from ruamel.yaml import YAML
 import pickle 
 from encoder import OHEncoder, TargetEncoder
-from utils import load_data
 from preprocess import PreProcessing
 
-headers = ['tourney_date', 'best_of', 'match_num', 'round', 'surface', 'tourney_level',
- 'p1_age', 'p1_hand', 'p1_ht', 'p1_id', 'p1_ioc', 'p1_rank', 'p1_rank_points', 'p1_seed',
- 'p2_age', 'p2_hand', 'p2_ht', 'p2_id', 'p2_ioc', 'p2_rank','p2_rank_points', 'p2_seed']
 
-# Load config: 
+
+# Load config
 config_path = "config.yaml"
 yaml = YAML(typ="safe")
 with open(config_path) as f:
@@ -24,14 +21,16 @@ ohe = pickle.load(open(params['onehot_encoder_path'], 'rb'))
 target_encoder_params = pickle.load(open(params['target_encoder_path'], 'rb'))
 # model
 model =  pickle.load(open(params['model_path'], 'rb'))
+# features names for prediction
+features = params['features_for_prediction']
 
 app = Flask(__name__)
 CORS(app)
 
 def predict_winner(values : list[Any])-> float:
     #values = [20150816, 3, 2, 'R64', 'Hard', 'M', 30.33, 'R', 188.0, 104542, 'FRA', 19.0, 1645.0, 'None', 31.75, 'L', 188.0, 104269, 'ESP', 43.0, 995.0, 'None']
-    assert len(values) == len(headers)
-    data = pd.DataFrame([values], columns=headers)
+    assert len(values) == len(features)
+    data = pd.DataFrame([values], columns=features)
     preprocessor = PreProcessing(data, [],  \
     params['features_to_fill_by_median'], params['features_to_remove_nan_values'])
     preprocessor.preprocess()

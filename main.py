@@ -6,11 +6,11 @@ from sklearn.metrics import classification_report
 import pickle
 from train_model import train_models
 
-def main():
-  
-    # Load config: 
-    config_path = "config.yaml"
+def main() -> None:
+    """ Preprocess data, train and evaluate classification model """
 
+    # Load config
+    config_path = "config.yaml"
     yaml = YAML(typ="safe")
     with open(config_path) as f:
         params = yaml.load(f)
@@ -23,14 +23,13 @@ def main():
     params['features_to_fill_by_median'], params['features_to_remove_nan_values'])
     preprocessor.preprocess()
     
-    # split data
+    # split data and take into consideration time feature
     X_train, X_test, y_train, y_test = train_test_split_per_time(preprocessor.data)
     
     # OneHotEnconder
     oh_encoder = OHEncoder(params['low_cardinality_categorical_features'])
     ohe = oh_encoder.get_onehot_encoder(X_train)
-    
-    # save onehot encoder
+    # save onehot encoder for inference
     pickle.dump(ohe, open(params['onehot_encoder_path'], 'wb'))
     encoded_oh_X_train = oh_encoder.transfrom_with_ohe(X_train, ohe)
     encoded_oh_X_test = oh_encoder.transfrom_with_ohe(X_test, ohe)
@@ -38,8 +37,7 @@ def main():
     # Target Encoder
     target_encoder = TargetEncoder()
     target_encoder_params = target_encoder.get_target_encoder_params(X_train, y_train, params['high_cardinality_categorical_features'],)
-    
-    # save target encoder
+    # save target encoder for inference
     # the advantage of HIGHEST_PROTOCOL is that files get smaller. This makes unpickling sometimes much faster
     pickle.dump(target_encoder_params, open(params['target_encoder_path'], 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
     

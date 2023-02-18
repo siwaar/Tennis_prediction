@@ -19,3 +19,7 @@ low_cardinality_categorical_features: ['best_of', 'p2_hand',  'p1_hand', 'round'
     
 high_cardinality_categorical_features: ['p2_id', 'p1_id', 'p1_ioc', 'p2_ioc']
 
+features_for_prediction : ['tourney_date', 'best_of', 'match_num', 'round', 'surface', 'tourney_level',
+ 'p1_age', 'p1_hand', 'p1_ht', 'p1_id', 'p1_ioc', 'p1_rank', 'p1_rank_points', 'p1_seed',
+ 'p2_age', 'p2_hand', 'p2_ht', 'p2_id', 'p2_ioc', 'p2_rank','p2_rank_points', 'p2_seed']
+

@@ -32,6 +32,7 @@ class PreProcessing:
         
 
     def _display_columns_with_nan_values(self) -> None:
+        # sourcery skip: dict-comprehension
         """
         Find columns that contain nan values.
         """
