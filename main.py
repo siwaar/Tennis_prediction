@@ -1,6 +1,6 @@
 from ruamel.yaml import YAML
 import pandas as pd
-from encoder import FeaturesEncoder
+from encoder import OHEncoder, TargetEncoder
 from preprocess import PreProcessing, load_data
 from sklearn.metrics import classification_report
 import pickle
@@ -9,36 +9,44 @@ import pandas as pd
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
 from lightgbm import LGBMClassifier
 
-def train_models(X_train , y_train) :
-    """ Train and finetune model  """
+def main():
+  
+    # Load config: 
+    config_path = "config.yaml"
 
-    print(f'''\n{'-'*20} Train LightGBM model  {'-'*20}''')
-    model = LGBMClassifier
-    model().fit(X_train, y_train)
+    yaml = YAML(typ="safe")
+    with open(config_path) as f:
+        params = yaml.load(f)
     
-    print(f'''\n{'-'*20} Finetune LightGBM model  {'-'*20}''')
-    n_splits = 3
-    tscv = TimeSeriesSplit(n_splits)
-    model_tuned = GridSearchCV(
-            estimator=model(),
-            param_grid={'num_leaves': (15, 31, 45),
-                        'max_depth': (-1, 5, 10),
-                        'learning_rate': (0.05, 0.1, 0.2),
-                        'n_estimators': (25, 50, 100)
-                        },
-            scoring='f1',
-            cv=tscv,
-            n_jobs=3,
-            verbose=1,
-            refit=True
-            )
-
-    model_tuned.fit(X_train,y_train)
-    # printing the best parameters
-    print(f"Best parameters {model_tuned.best_params_}")
-    best_model = model(**model_tuned.best_params_)
-    best_model.fit(X_train, y_train)
-    return best_model
+    data = load_data(params['data_csv_path'])
+    preprocessor = PreProcessing(data, params['features_to_drop'],  \
+    params['features_to_fill_by_median'], params['features_to_remove_nan_values'])
+    preprocessor.preprocess()
+    # split data
+    X_train, X_test, y_train, y_test = train_test_split_per_time(preprocessor.data)
+    # Encoding
+    oh_encoder = OHEncoder(params['low_cardinality_categorical_features'])
+    # OneHotEnconder
+    ohe = oh_encoder.get_onehot_encoder(X_train)
+    # save onehot encoder
+    pickle.dump(ohe, open(params['onehot_encoder_path'], 'wb'))
+    encoded_oh_X_train = oh_encoder.transfrom_with_ohe(X_train, ohe)
+    encoded_oh_X_test = oh_encoder.transfrom_with_ohe(X_test, ohe)
+    # Target Encoder
+    target_encoder = TargetEncoder()
+    target_encoder_params = target_encoder.get_target_encoder_params(X_train, y_train, params['high_cardinality_categorical_features'],)
+    # save target encoder
+    pickle.dump(target_encoder_params, open(params['target_encoder_path'], 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
+    # The advantage of HIGHEST_PROTOCOL is that files get smaller. This makes unpickling sometimes much faster
+    encoded_X_train = target_encoder.transform_with_target_encoder(encoded_oh_X_train, target_encoder_params)
+    encoded_X_test = target_encoder.transform_with_target_encoder(encoded_oh_X_test, target_encoder_params)
+    # Train and choose the best parameters for the model
+    best_model = train_models(encoded_X_train, y_train)
+    # Save model
+    pickle.dump(best_model, open(params['model_path'], 'wb'))
+    # Prediction
+    y_pred = best_model.predict(encoded_X_test)
+    print(classification_report(y_test, y_pred))
 
 
 def train_test_split_per_time(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series,pd.Series]:
@@ -71,43 +79,36 @@ def train_test_split_per_time(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.Data
     return X_train, X_test, y_train, y_test
 
 
-def main():
-  
-    # Load config: 
-    config_path = "config.yaml"
+def train_models(X_train , y_train) :
+    """ Train and finetune model  """
 
-    yaml = YAML(typ="safe")
-    with open(config_path) as f:
-        params = yaml.load(f)
+    print(f'''\n{'-'*20} Train LightGBM model  {'-'*20}''')
+    model = LGBMClassifier
+    model().fit(X_train, y_train)
     
-    data = load_data(params['data_csv_path'])
-    preprocessor = PreProcessing(data, params['features_to_drop'],  \
-    params['features_to_fill_by_median'], params['features_to_remove_nan_values'])
-    preprocessor.preprocess()
-    # split data
-    X_train, X_test, y_train, y_test = train_test_split_per_time(preprocessor.data)
-    # Encoding
-    feature_encoder = FeaturesEncoder(params)
-    # OneHotEnconder
-    ohe = feature_encoder.get_onehot_encoder(X_train)
-    # save onehot encoder
-    pickle.dump(ohe, open(params['onehot_encoder_path'], 'wb'))
-    encoded_oh_X_train = feature_encoder.transfrom_with_ohe(X_train, ohe)
-    encoded_oh_X_test = feature_encoder.transfrom_with_ohe(X_test, ohe)
-    # Target Encoder
-    target_encoder_params = feature_encoder.get_target_encoder_params(X_train, y_train)
-    # save target encoder
-    pickle.dump(target_encoder_params, open(params['target_encoder_path'], 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
-    # The advantage of HIGHEST_PROTOCOL is that files get smaller. This makes unpickling sometimes much faster
-    encoded_X_train = feature_encoder.transform_with_target_encoder(encoded_oh_X_train, target_encoder_params)
-    encoded_X_test = feature_encoder.transform_with_target_encoder(encoded_oh_X_test, target_encoder_params)
-    # Train and choose the best parameters for the model
-    best_model = train_models(encoded_X_train, y_train)
-    # Save model
-    pickle.dump(best_model, open(params['model_path'], 'wb'))
-    # Prediction
-    y_pred = best_model.predict(encoded_X_test)
-    print(classification_report(y_test, y_pred))
+    print(f'''\n{'-'*20} Finetune LightGBM model  {'-'*20}''')
+    n_splits = 3
+    tscv = TimeSeriesSplit(n_splits)
+    model_tuned = GridSearchCV(
+            estimator=model(),
+            param_grid={'num_leaves': (15, 31, 45),
+                        'max_depth': (-1, 5, 10),
+                        'learning_rate': (0.05, 0.1, 0.2),
+                        'n_estimators': (25, 50, 100)
+                        },
+            scoring='f1',
+            cv=tscv,
+            n_jobs=3,
+            verbose=1,
+            refit=True
+            )
+
+    model_tuned.fit(X_train,y_train)
+    # printing the best parameters
+    print(f"Best parameters {model_tuned.best_params_}")
+    best_model = model(**model_tuned.best_params_)
+    best_model.fit(X_train, y_train)
+    return best_model
 
     
 if __name__ == "__main__":

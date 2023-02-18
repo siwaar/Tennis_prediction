@@ -39,7 +39,7 @@ You will find predictions of our model in : `predictions/predictions.csv`
 ## Models used
 We first used different methods to get the encoding and add new features and then we used LightGBM model to predict the winner of a tennis match.
 You will find more documentation of the choice of different models in : `documentation`
-You will find trained models in the folder : `model`
+You will find trained models in the folder : `models`
 
 ## Project description
 This ML project is a supervised binary classification where our target feature called `p1_won` can have 2 values :

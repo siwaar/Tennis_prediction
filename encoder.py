@@ -3,17 +3,10 @@ import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 
 
-class FeaturesEncoder:
-    def __init__(self, params: dict[str, str]) -> None:
-        """ Apply feature engineering 
-        Args:
-            data (pd.DataFrame): preprocessed data
-            params (dict[str, str]): a dictionary containing selected columns for a 
-            spacial feature engineering.
-            target (pd.DataFrame): ground truth of the training set
-        """
-        self.low_cardinality_categorical_features = params['low_cardinality_categorical_features']
-        self.high_cardinality_categorical_features = params['high_cardinality_categorical_features']
+class OHEncoder:
+    def __init__(self, low_cardinality_categorical_features: list[str]) -> None:
+        
+        self.low_cardinality_categorical_features = low_cardinality_categorical_features
         
     def get_onehot_encoder(self, X_train: pd.DataFrame):
         oh_encoder = OneHotEncoder(handle_unknown='ignore', sparse=False)
@@ -30,33 +23,40 @@ class FeaturesEncoder:
         other_X_cols = X.drop(self.low_cardinality_categorical_features , axis=1)
         return pd.concat([other_X_cols, transformed_X], axis=1)
 
-    def get_target_encoder_params(self, X_train: pd.DataFrame, y_train):
+class TargetEncoder:
+    def __init__(self) -> None:
+        pass
+
+    def get_target_encoder_params(self, X_train: pd.DataFrame, y_train, \
+        high_cardinality_categorical_features: list[str]):
+
         encoder_params : dict[str, tuple] = {}
-        for feature in self.high_cardinality_categorical_features:
-            averages, prior = FeaturesEncoder.get_target_encoder_parameters_per_feature(trn_series=X_train[feature], 
+        for feature in high_cardinality_categorical_features:
+            averages, prior = TargetEncoder.get_target_encoder_parameters_per_feature(trn_series=X_train[feature], 
                                     target=y_train, 
                                     min_samples_leaf=100,
                                     smoothing=10)
             encoder_params[feature] = (averages, prior)
         return encoder_params
 
-    def transform_with_target_encoder(self, X:pd.DataFrame, encoder_params)-> pd.DataFrame:
+    @staticmethod
+    def transform_with_target_encoder(X:pd.DataFrame, encoder_params)-> pd.DataFrame:
+
         for feature, (averages, prior) in encoder_params.items():
-            X[feature] = FeaturesEncoder.target_encode_one_feature(X[feature], averages, prior)
+            X[feature] = TargetEncoder.target_encode_one_feature(X[feature], averages, prior)
 
         return X
-
 
     @staticmethod
     def add_noise(series):
         noise_level = 0.01
         return series * (1 + noise_level * np.random.randn(len(series)))
-    
+
     @staticmethod
     def get_target_encoder_parameters_per_feature(trn_series=None,  
-                  target=None, 
-                  min_samples_leaf=1, 
-                  smoothing=1):
+                    target=None, 
+                    min_samples_leaf=1, 
+                    smoothing=1):
 
         temp = pd.concat([trn_series, target], axis=1)
         
@@ -74,9 +74,10 @@ class FeaturesEncoder:
         averages.drop(["mean", "count"], axis=1, inplace=True)
         
         return averages, prior
-    
+
     @staticmethod
     def target_encode_one_feature(X, averages, prior):
+
         # Apply averages 
         ft_X= pd.merge(
             X.to_frame(X.name),
@@ -87,7 +88,7 @@ class FeaturesEncoder:
         # pd.merge does not keep the index so restore it
         ft_X.index = X.index 
 
-        return  FeaturesEncoder.add_noise(ft_X)
+        return TargetEncoder.add_noise(ft_X)
 
 
    

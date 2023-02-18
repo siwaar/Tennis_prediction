@@ -1,9 +1,9 @@
 data_csv_path : 'data/ATP_tweaked.csv'
 data_to_predict_csv_path : 'data/data_to_predict.csv'
 predictions_csv_path : 'predictions/predictions.csv'
-onehot_encoder_path : 'model/onehot_encoder.pkl'
-target_encoder_path : 'model/target_encoder.pkl'
-model_path : 'model/lightGBM_model.pkl'
+onehot_encoder_path : 'models/onehot_encoder.pkl'
+target_encoder_path : 'models/target_encoder.pkl'
+model_path : 'models/lightGBM_model.pkl'
 
 features_to_drop : ['tourney_name', 'tourney_id', 'p2_name', 'p1_name', 'minutes', 'score',
                      'p1_1stIn', 'p2_1stIn', 'p1_1stWon', 'p2_1stWon', 'p1_2ndWon', 'p2_2ndWon',
