@@ -1,9 +1,12 @@
 FROM python
 
-WORKDIR /root/
-COPY . /root/
+ADD requirements.txt /
 
 RUN pip install -r requirements.txt
-RUN pip install pre-commit &&  pre-commit install
+#RUN pip install pre-commit &&  pre-commit install
 
-RUN python3 code_inference.py
+ADD ./app
+WORKDIR /app
+
+EXPOSE 5000
+RUN python3 app.py
