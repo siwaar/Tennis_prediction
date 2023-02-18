@@ -1,15 +1,14 @@
+from typing import Any
 from flask import Flask, request, render_template, jsonify
 from flask_cors import CORS
 import pandas as pd
-import json
-import joblib
 from ruamel.yaml import YAML
 import pickle 
 from encoder import OHEncoder, TargetEncoder
 from utils import load_data
 from preprocess import PreProcessing
 
-headers = ['best_of', 'match_num', 'round', 'surface', 'tourney_date', 'tourney_level',
+headers = ['tourney_date', 'best_of', 'match_num', 'round', 'surface', 'tourney_level',
  'p1_age', 'p1_hand', 'p1_ht', 'p1_id', 'p1_ioc', 'p1_rank', 'p1_rank_points', 'p1_seed',
  'p2_age', 'p2_hand', 'p2_ht', 'p2_id', 'p2_ioc', 'p2_rank','p2_rank_points', 'p2_seed']
 
@@ -29,15 +28,16 @@ model =  pickle.load(open(params['model_path'], 'rb'))
 app = Flask(__name__)
 CORS(app)
 
-def compute(values):  
-    data = pd.DataFrame([values],columns=headers)
+def predict_winner(values : list[Any])-> float:
+    #values = [20150816, 3, 2, 'R64', 'Hard', 'M', 30.33, 'R', 188.0, 104542, 'FRA', 19.0, 1645.0, 'None', 31.75, 'L', 188.0, 104269, 'ESP', 43.0, 995.0, 'None']
+    assert len(values) == len(headers)
+    data = pd.DataFrame([values], columns=headers)
     preprocessor = PreProcessing(data, [],  \
     params['features_to_fill_by_median'], params['features_to_remove_nan_values'])
     preprocessor.preprocess()
     preprocessed_data = preprocessor.data
     if 'p1_won' in data.columns:
         preprocessed_data = preprocessed_data.drop(columns=['p1_won'], axis=1)
-    
     # Encoding
     oh_encoder = OHEncoder(params['low_cardinality_categorical_features'])
     # OneHotEnconder
@@ -47,7 +47,7 @@ def compute(values):
     encoded_X = target_encoder.transform_with_target_encoder(encoded_oh_X, target_encoder_params)
     encoded_X = encoded_X.drop(columns=['tourney_date'])
     # prediction
-    return float(model.predict_proba(encoded_X))
+    return model.predict_proba(encoded_X)[0][1]
 
 @app.route("/", methods=['GET'])
 def hello():
@@ -57,7 +57,7 @@ def hello():
 def predict():
     payload = request.json['data']
     values = [float(i) for i in payload]
-    return jsonify({'prediction':compute(values)})
+    return jsonify({'prediction':predict_winner(values)})
 
 @app.route("/atp_winner", methods=['POST','GET'])
 def predict_interface():
@@ -67,9 +67,11 @@ def predict_interface():
         result = request.form
         for v in result.values():
             values.append(v)
-        res = compute(values)
-
-        return render_template('index.html', result='The first player will succeed with probability {}%'.format( 100 * round(res , 2) ) )
+        proba_p1_won = predict_winner(values)
+        if proba_p1_won > 0.5 :
+            return render_template('index.html', result='The first player will succeed with probability {}%'.format( 100 * round(proba_p1_won , 2)))
+        else: 
+            return render_template('index.html', result='The second player will succeed with probability {}%'.format( 100 * round(1 - proba_p1_won , 2)))
     return render_template('index.html')
 
 

@@ -36,11 +36,12 @@ class PreProcessing:
         Find columns that contain nan values.
         """
         nb_rows = len(self.data)
-        features_with_nan_values: dict[str, float] = {
-            c: round((1 - self.data[c].count() / nb_rows) * 100, 2)
-            for c in self.data.columns
-            if self.data[c].count() < nb_rows
-        }
+        features_with_nan_values: dict[str, float] = {}
+        for c in self.data.columns :
+            if self.data[c].count() < nb_rows :
+                features_with_nan_values[c] = round((1 - self.data[c].count() / nb_rows) * 100, 2)
+           
+        
         features_with_nan_values = {
             k: f'{str(v)}%'
             for k, v in sorted(
@@ -54,7 +55,7 @@ class PreProcessing:
  
     def _fill_nan_values(self) -> None:
         """  Fill nan values """
-        
+        self.data.replace(to_replace=['None'], value=None, inplace=True)
         self._display_columns_with_nan_values()
 
         print(f'\nImpute missing values with median for these features : {self.features_to_fill_by_median}')
@@ -62,16 +63,17 @@ class PreProcessing:
               
         # fill nan values by a median
         for c in self.features_to_fill_by_median:
-            self.data[c] = self.data[c].fillna((self.data[c].median()))
-        
+            if self.data[c].count() > 0 :
+                self.data[c] = self.data[c].fillna((self.data[c].median()))
+            else: 
+                self.data[c] = self.data[c].fillna(0)
         ## fillna for pi_hand with 'U' as there is already an unkonwn category
         self.data['p1_hand'] = self.data['p1_hand'].fillna('U')
         self.data['p2_hand'] = self.data['p2_hand'].fillna('U')
         self.data.reset_index(inplace=True, drop=True)
 
-        # remove empty rows for important features
-        self.data.replace(to_replace=['None'], value=None, inplace=True)
-        self.data.dropna(how='any',inplace=True) 
+        # remove empty rows for important features 
+        # self.data.dropna(how='any',inplace=True) 
 
         self._display_columns_with_nan_values()
         return None
