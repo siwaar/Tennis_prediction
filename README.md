@@ -82,9 +82,9 @@ To **fine tune the hyperparameters** of our classifier model, we used **Grid Sea
 Since our dataset is **balanced**, the **metric of evaluation** we used is **F1 score** which represents both precision and recall in one metric. 
 We split our dataset in 80% Train and 20% Test sets.
 Results found on the test set: 
- - `F1 score = 63%` 
- - `Precision = 62.5%`
- - `Recall = 63%`
+ - `F1 score = 62%` 
+ - `Precision = 62%`
+ - `Recall = 62%`
 
 
 ## Further Work

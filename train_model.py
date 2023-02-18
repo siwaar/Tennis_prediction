@@ -2,8 +2,8 @@ from time import time
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
 from lightgbm import LGBMClassifier
 import pandas as pd
-import random
-random.seed(42)
+import numpy as np
+np.random.seed(42)
 
 
 def train_models(X_train : pd.DataFrame , y_train: pd.DataFrame) -> LGBMClassifier:
