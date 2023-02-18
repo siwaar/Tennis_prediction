@@ -36,6 +36,17 @@ python code_inference.py
 
 You will find predictions of our model in : `predictions/predictions.csv`
 
+## Build Docker Image
+To build docker image, we need to run :
+```
+docker build -t tennis-docker .
+```
+
+To launch docker container, we need to run :
+```
+docker run -d -p 8080:8080 tennis-docker
+```
+
 ## Models used
 We first used different methods to get the encoding and add new features and then we used LightGBM model to predict the winner of a tennis match.
 You will find more documentation of the choice of different models in : `documentation`
