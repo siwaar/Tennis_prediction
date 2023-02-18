@@ -73,6 +73,7 @@ Results found on the test set:
 - Normalize the numerical features.
 - Deal with outliers.
 - More consider the time dependency.
+- More investigate in the fetaures description in order to extract more feature and also try a better way for feature selection.
 - Make predictions during the match by adding information about the current situation.
    
 

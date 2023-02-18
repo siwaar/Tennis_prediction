@@ -1,6 +1,7 @@
 import pandas as pd
 import json
 
+
 def load_data(data_path: str) -> pd.DataFrame:
     """ Load data with the path provided in config.yaml
     Args:
@@ -17,7 +18,7 @@ def load_data(data_path: str) -> pd.DataFrame:
         return data
     except Exception as e:
         raise "No data found with the path provided in config.yaml" from e
-        
+
 class PreProcessing:
     """ Deal with nan values, drop useless columns"""
     
