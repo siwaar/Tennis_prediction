@@ -1,13 +1,15 @@
-# ATP LittleBigCode Use Case : Prediction of the winner of a tennis match.
+# LittleBigCode Use Case : Prediction of the winner of a tennis match.
 Author : [Siwar ABBES](https://www.linkedin.com/in/siwar-abbes/)
 
 **The aim of this work** is to explore data from ATP tennis competitions in order to predict the results of tennis matches.
 
 ## Datasets 
 The data set contains the details about ATP matches played between 04/01/2015 and 25/02/2019.
+
 You will have more information about the dataset in the notebook.
 In the config file : `config.yaml`, you need to specify :
-- `data_csv_path` : The path for the dataset to train and test the model, example : 'data/ATP_tweaked.csv'
+
+`data_csv_path` : The path for the dataset to train and test the model, example : 'data/ATP_tweaked.csv'
 
 ## Requirements 
 
@@ -25,7 +27,8 @@ python main.py
 
 ## Predict results for a new dataset
 In the config file : `config.yaml`, you need to specify :
-`data_to_predict_csv_path` : The path for the new datatset to predict, example : 'data/data_to_predict.csv'
+
+`data_to_predict_csv_path` : The path for the new datatset to predict, example : 'data/data_to_predict.csv' and run :
 
 ```
 python code_inference.py
