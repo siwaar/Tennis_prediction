@@ -12,12 +12,22 @@ In the config file : `config.yaml`, you need to specify :
 `data_csv_path` : The path for the dataset to train and test the model, example : 'data/ATP_tweaked.csv'
 
 ## Requirements 
+On Ubuntu :
 
 ```
 python3 -m venv tennis_env
 source tennis_env/bin/activate
 pip install -r requirements.txt
 pip install pre-commit &&  pre-commit install
+```
+
+On Windows :
+```
+python3 -m venv tennis_env
+.\tennis_env\Scripts\activate 
+pip install -r requirements.txt
+pip install pre-commit 
+pre-commit install
 ```
 ## Generate the prediction model
 In order to regenerate the prediction model, you need to run :
@@ -37,6 +47,7 @@ python code_inference.py
 You will find predictions of our model in : `predictions/predictions.csv`
 
 ## Build Docker Image
+First of all, we need to have docker installed on our machine:[link to install Docker](https://docs.docker.com/engine/install/)
 To build docker image, we need to run :
 ```
 docker build -t tennis-docker .

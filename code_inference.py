@@ -1,7 +1,8 @@
 import pickle
 from ruamel.yaml import YAML
-from encoder import FeaturesEncoder
-from preprocess import PreProcessing, load_data
+from encoder import OHEncoder, TargetEncoder
+from utils import load_data
+from preprocess import PreProcessing
 import pandas as pd
 
 class ATPWinnerPredict(object):
@@ -29,11 +30,13 @@ class ATPWinnerPredict(object):
         if 'p1_won' in self.data.columns:
             preprocessed_data = preprocessed_data.drop(columns=['p1_won'], axis=1)
         
-        feature_encoder = FeaturesEncoder(self.params)
+        # Encoding
+        oh_encoder = OHEncoder(self.params['low_cardinality_categorical_features'])
         # OneHotEnconder
-        encoded_oh_X = feature_encoder.transfrom_with_ohe(preprocessed_data, self.ohe)
-        # target Encoder
-        encoded_X = feature_encoder.transform_with_target_encoder(encoded_oh_X, self.target_encoder_params)
+        encoded_oh_X = oh_encoder.transfrom_with_ohe(preprocessed_data, self.ohe)
+        # Target Encoder
+        target_encoder = TargetEncoder()
+        encoded_X = target_encoder.transform_with_target_encoder(encoded_oh_X, self.target_encoder_params)
         encoded_X = encoded_X.drop(columns=['tourney_date'])
         # prediction
         predictions = self.model.predict(encoded_X)
