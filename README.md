@@ -1,5 +1,6 @@
 # ATP LittleBigCode Use Case : Prediction of the winner of a tennis match.
 Author : [Siwar ABBES](https://www.linkedin.com/in/siwar-abbes/)
+
 **The aim of this work** is to explore data from ATP tennis competitions in order to predict the results of tennis matches.
 
 ## Datasets 
@@ -24,7 +25,7 @@ python main.py
 
 ## Predict results for a new dataset
 In the config file : `config.yaml`, you need to specify :
-- `data_to_predict_csv_path` : The path for the new datatset to predict, example : 'data/data_to_predict.csv'
+`data_to_predict_csv_path` : The path for the new datatset to predict, example : 'data/data_to_predict.csv'
 
 ```
 python code_inference.py
@@ -53,7 +54,7 @@ This ML project is a supervised binary classification where our target feature c
 To **fine tune the hyperparameters** of our classifier model, we used **Grid Search** with **Time Series Cross Validation**.
 
 ## Evaluation 
-Since our dataset is **balanced**, the **metric of evaluation** we used if **F1 score** represents both precision and recall in one metric. 
+Since our dataset is **balanced**, the **metric of evaluation** we used is **F1 score** which represents both precision and recall in one metric. 
 We split our dataset in 80% Train and 20% Test sets.
 Results found on the test set: 
  - `F1 score = 63%` 
@@ -68,6 +69,7 @@ Results found on the test set:
 - Apply more accurate Encoding for categorical features such as the feature 'Tourney_name' or 'Tourney_id' instead of droping this information.
 - Normalize the numerical features.
 - Deal with outliers.
+- More consider the time dependency.
 - Make predictions during the match by adding information about the current situation.
    
 
