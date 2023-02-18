@@ -1,6 +1,5 @@
-# ATP Little Big Code Use Case : 
-## Conduct a Data Science study on the ATP dataset to predict the winner of matches.
-Author : Siwar ABBES
+# ATP Little Big Code Use Case : Prediction of the winning player in a tennis match
+Author : [Siwar ABBES](https://www.linkedin.com/in/siwar-abbes/)
 
 
 ## Setting :
