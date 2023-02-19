@@ -9,4 +9,4 @@ ADD ./app
 WORKDIR /app
 
 EXPOSE 5000
-RUN python3 app.py
+CMD ["python3", "app.py"]

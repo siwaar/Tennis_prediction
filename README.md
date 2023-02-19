@@ -83,6 +83,7 @@ This ML project is a supervised binary classification where our target feature c
  - Drop features with more than 80% missing values.
  - Drop features which cannot be known in advance of the match.
  - Deal with missing values.
+ - Deal with skewed numerical features
  - Encode categorical features with low cardinality with OneHotEncoder.
  - Encode categorical features with high cardinality with TargetEncoder.
 
@@ -97,7 +98,7 @@ Results found on the test set: `F1 score = 63%`
 ## Further Work
 - Make more data preprocessing and feature engineering such as :
     - Impute missing values with the intersection of information for the same player in other matches.
-    - Extract the number of matches won previously by a player.
+    - Extract from other features known during the match to create new features about the historic of the player such as extract the number of matches won previously by a player.
 - Apply more accurate Encoding for categorical features such as the feature 'Tourney_name' or 'Tourney_id' instead of droping this information.
 - Normalize the numerical features.
 - Deal with outliers.
