@@ -70,8 +70,8 @@ Browse http://localhost:5000
 ![Interface screen](static/images/interface.PNG)
 ## Models used
 We first used different methods to get the encoding and add new features and then we used LightGBM model to predict the winner of a tennis match.
-You will find more documentation of the choice of different models in : `ABBES_Siwar_LBC_UseCase.ipynb`
-You will find trained model and encoders in the folder : `models`
+- You will find more documentation of the choice of different models in : `ABBES_Siwar_LBC_UseCase.ipynb`
+- You will find trained model, scaler and encoders in the folder : `models`
 
 ## Project description
 This ML project is a supervised binary classification where our target feature called `p1_won` can have 2 values :
