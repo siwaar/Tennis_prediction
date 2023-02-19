@@ -54,7 +54,8 @@ docker pull siwarabbes/tennis_prediction
 docker run -d -p 5000:5000 siwarabbes/tennis_prediction:latest
 ```
 then Browse http://localhost:5000
-[Interface screen](static/images/interface.PNG)
+
+![Interface screen](static/images/interface.PNG)
 ## Deploy web service and web application using docker
 
 First of all, we need to have docker installed on our machine:[link to install Docker](https://docs.docker.com/engine/install/)
