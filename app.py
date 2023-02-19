@@ -54,7 +54,7 @@ def predict_winner(values : list[Any])-> float:
 
 @app.route("/", methods=['GET'])
 def hello():
-    return "Welcome to ATP winner predictor tool"
+    return render_template('index.html')
 
 @app.route("/api/atp_winner", methods=['POST'])
 def predict():
