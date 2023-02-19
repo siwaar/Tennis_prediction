@@ -82,7 +82,7 @@ This ML project is a supervised binary classification where our target feature c
  - Drop features which cannot be known in advance of the match.
  - Deal with missing values.
  - Encode categorical features with low cardinality with OneHotEncoder.
- - ENcode categorical features with high cardinality with TargetEncoder.
+ - Encode categorical features with high cardinality with TargetEncoder.
 
 To **fine tune the hyperparameters** of our classifier model, we used **Grid Search** with **Time Series Cross Validation**.
 

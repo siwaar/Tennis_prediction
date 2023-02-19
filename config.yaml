@@ -5,7 +5,7 @@ onehot_encoder_path : 'models/onehot_encoder.pkl'
 target_encoder_path : 'models/target_encoder.pkl'
 model_path : 'models/lightGBM_model.pkl'
 
-features_to_drop : ['tourney_name', 'tourney_id', 'p2_name', 'p1_name', 'minutes', 'score',
+features_to_drop : ['tourney_name', 'p2_name', 'p1_name', 'minutes', 'score',
                      'p1_1stIn', 'p2_1stIn', 'p1_1stWon', 'p2_1stWon', 'p1_2ndWon', 'p2_2ndWon',
                      'p1_SvGms', 'p2_SvGms', 'p1_svpt','p2_svpt', 'p1_bpFaced', 'p2_bpFaced', 'p1_bpSaved', 
                      'p2_bpSaved','p1_ace','p2_ace','p1_df', 'p2_df', 'p1_entry', 'p2_entry']
@@ -17,9 +17,10 @@ features_to_fill_by_median: [ 'p1_rank','p2_rank', 'p1_rank_points', 'p1_age', '
                                 
 low_cardinality_categorical_features: ['best_of', 'p2_hand',  'p1_hand', 'round', 'surface', 'tourney_level']
     
-high_cardinality_categorical_features: ['p2_id', 'p1_id', 'p1_ioc', 'p2_ioc']
+high_cardinality_categorical_features: ['p2_id', 'p1_id', 'p1_ioc', 'p2_ioc', 'tourney_id']
 
-features_for_prediction : ['tourney_date', 'best_of', 'match_num', 'round', 'surface', 'tourney_level',
+features_for_prediction : ['tourney_id', 'tourney_date', 'best_of', 'match_num', 'round', 'surface', 'tourney_level',
  'p1_age', 'p1_hand', 'p1_ht', 'p1_id', 'p1_ioc', 'p1_rank', 'p1_rank_points', 'p1_seed',
  'p2_age', 'p2_hand', 'p2_ht', 'p2_id', 'p2_ioc', 'p2_rank','p2_rank_points', 'p2_seed']
 
+features_to_log : [ 'p2_rank', 'p2_rank_points', 'p2_seed','p1_id', 'p1_rank', 'p1_rank_points','p1_seed']

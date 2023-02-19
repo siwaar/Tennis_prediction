@@ -28,11 +28,12 @@ app = Flask(__name__)
 CORS(app)
 
 def predict_winner(values : list[Any])-> float:
-    #values = [20150816, 3, 2, 'R64', 'Hard', 'M', 30.33, 'R', 188.0, 104542, 'FRA', 19.0, 1645.0, 'None', 31.75, 'L', 188.0, 104269, 'ESP', 43.0, 995.0, 'None']
+    #values = ['2015-339', 20150816, 3, 2, 'R64', 'Hard', 'M', 30.33, 'R', 188.0, 104542, 'FRA', 19.0, 1645.0, 'None', 31.75, 'L', 188.0, 104269, 'ESP', 43.0, 995.0, 'None']
     assert len(values) == len(features)
     data = pd.DataFrame([values], columns=features)
     preprocessor = PreProcessing(data, [],  \
-    params['features_to_fill_by_median'], params['features_to_remove_nan_values'])
+    params['features_to_fill_by_median'], params['features_to_remove_nan_values'],
+    params['features_to_log'])
     preprocessor.preprocess()
     preprocessed_data = preprocessor.data
     if 'p1_won' in data.columns:

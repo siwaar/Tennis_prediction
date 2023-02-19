@@ -24,7 +24,8 @@ class ATPWinnerPredict(object):
     def run(self) -> None:
         
         preprocessor = PreProcessing(self.data, self.params['features_to_drop'],  \
-        self.params['features_to_fill_by_median'], self.params['features_to_remove_nan_values'])
+        self.params['features_to_fill_by_median'], self.params['features_to_remove_nan_values'],\
+            self.params['features_to_log'])
         preprocessor.preprocess()
         preprocessed_data = preprocessor.data
         if 'p1_won' in self.data.columns:

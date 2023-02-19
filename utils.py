@@ -1,6 +1,6 @@
 import pandas as pd 
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, classification_report, accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 def load_data(data_path: str) -> pd.DataFrame:
     """ Load data with the path provided in config.yaml

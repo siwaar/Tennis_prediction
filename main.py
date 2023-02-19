@@ -20,8 +20,8 @@ def main() -> None:
     data = load_data(params['data_csv_path'])
     
     # Preprocessing
-    preprocessor = PreProcessing(data, params['features_to_drop'],  \
-    params['features_to_fill_by_median'], params['features_to_remove_nan_values'])
+    preprocessor = PreProcessing(data, params['features_to_drop'], params['features_to_fill_by_median'],\
+         params['features_to_remove_nan_values'], params['features_to_log'])
     preprocessor.preprocess(is_for_train=True)
     
     # split data and take into consideration time feature
@@ -37,7 +37,7 @@ def main() -> None:
     
     # Target Encoder
     target_encoder = TargetEncoder()
-    target_encoder_params = target_encoder.get_target_encoder_params(X_train, y_train, params['high_cardinality_categorical_features'],)
+    target_encoder_params = target_encoder.get_target_encoder_params(X_train, y_train, params['high_cardinality_categorical_features'])
     # save target encoder for inference
     # the advantage of HIGHEST_PROTOCOL is that files get smaller. This makes unpickling sometimes much faster
     pickle.dump(target_encoder_params, open(params['target_encoder_path'], 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
