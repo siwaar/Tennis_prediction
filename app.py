@@ -21,17 +21,24 @@ ohe = pickle.load(open(params['onehot_encoder_path'], 'rb'))
 target_encoder_params = pickle.load(open(params['target_encoder_path'], 'rb'))
 # model
 model =  pickle.load(open(params['model_path'], 'rb'))
+# scaler
+scaler =  pickle.load(open(params['scaler_path'], 'rb'))
 # features names for prediction
 features = params['features_for_prediction']
-features_type_int = ['p1_id', 'p2_id', 'match_num', 'p1_age', 'p2_age']
-features_type_float = ['p1_rank', 'p2_rank', 'p1_rank_points', 'p2_rank_points', 'p1_seed', 'p2_seed', 'p1_ht', 'p2_ht']
 
 
 app = Flask(__name__)
 CORS(app)
 
-def predict_winner(values : list[Any])-> float:
-    #values = ['2015-339', 20150816, 3, 2, 'R64', 'Hard', 'M', 30.33, 'R', 188.0, 104542, 'FRA', 19.0, 1645.0, 'None', 31.75, 'L', 188.0, 104269, 'ESP', 43.0, 995.0, 'None']
+def predict_winner(values : list[Any])-> int:
+    """ Predict if the first player will win
+
+    Args:
+        values (list[Any]): input from interface
+
+    Returns:
+        int: 1 if first player will win, 0 else
+    """
     assert len(values) == len(features)
     data = pd.DataFrame([values], columns=features)
     preprocessor = PreProcessing(data, [],  \
@@ -39,8 +46,8 @@ def predict_winner(values : list[Any])-> float:
     params['features_to_log'])
     preprocessor.preprocess()
     preprocessed_data = preprocessor.data
-    if 'p1_won' in data.columns:
-        preprocessed_data = preprocessed_data.drop(columns=['p1_won'], axis=1)
+    # Scaler
+    preprocessed_data[params['features_to_scale']] = scaler.transform(preprocessed_data[params['features_to_scale']].values)
     # Encoding
     oh_encoder = OHEncoder(params['low_cardinality_categorical_features'])
     # OneHotEnconder
@@ -50,7 +57,7 @@ def predict_winner(values : list[Any])-> float:
     encoded_X = target_encoder.transform_with_target_encoder(encoded_oh_X, target_encoder_params)
     encoded_X = encoded_X.drop(columns=['tourney_date'])
     # prediction
-    return model.predict_proba(encoded_X)[0][1]
+    return model.predict(encoded_X)[0]
 
 @app.route("/", methods=['GET'])
 def hello():
@@ -84,19 +91,22 @@ def predict_interface():
             except Exception as e:
                 return render_template('index.html', result='Please verify the provided information')
 
-        proba_p1_won = predict_winner(values)
-        if proba_p1_won > 0.50:
+        prediction = predict_winner(values)
+        if prediction == 1 :
             return render_template(
                     'index.html',
-                    result='Our classiffier predicted that the first player will succeed !')
+                    result='Our classiffier predicted that the first player will be the winner !')
         else:
             return render_template(
                 'index.html',
-                result='Our classiffier predicted that the second player will succeed !')
+                result='Our classiffier predicted that the second player will be the winner !')
         
     except Exception:
         return render_template('index.html')
 
+
+features_type_int = ['p1_id', 'p2_id', 'match_num', 'p1_age', 'p2_age']
+features_type_float = ['p1_rank', 'p2_rank', 'p1_rank_points', 'p2_rank_points', 'p1_seed', 'p2_seed', 'p1_ht', 'p2_ht']
 not_required_features = ['p1_hand', 'p2_hand', 'tourney_level']
 dict_features_options = {
             'best_of' : ['3','5'],
