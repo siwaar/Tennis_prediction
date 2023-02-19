@@ -67,7 +67,7 @@ $ python3 app.py
 ## Access to web application
 Browse http://localhost:5000
 
-![Interface screen](static/images/interface.jpg)
+![Interface screen](static/images/interface.PNG)
 ## Models used
 We first used different methods to get the encoding and add new features and then we used LightGBM model to predict the winner of a tennis match.
 You will find more documentation of the choice of different models in : `documentation`
