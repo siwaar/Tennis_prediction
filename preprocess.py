@@ -90,7 +90,6 @@ class PreProcessing:
         self.data['tourney_level'] = self.data['tourney_level'].fillna('A')
         self.data['tourney_level'] = self.data['tourney_level'].fillna('A')
         
-
         # remove empty rows for important features in train set
         if is_for_train:
             self.data.dropna(how='any',inplace=True) 

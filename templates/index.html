@@ -25,7 +25,7 @@
     <form action="{{ url_for('predict_interface') }}" method="post">
       <input type="number" step=0.01 name="tourney_id" value="{{ request.form['tourney_id'] }}"  placeholder="tourney_id" required="required" />  
       <input type="number" step=0.01 name="tourney_date" value="{{ request.form['tourney_date'] }}"  placeholder="tourney_date" required="required" /> 
-      <input type="number" step=0.01 name="best_of" value="{{ request.form['best_of'] }}"  placeholder="best_of" required="required" />
+      <input type="number" step=0.01 name="best_of" value="{{ request.form['best_of'] }}"  placeholder="best_of" required="no" />
       <input type="number" step=0.01 name="match_num" value="{{ request.form['match_num'] }}" placeholder="match_num" required="required" />
       <input type="number" step=0.01 name="round" value="{{ request.form['round'] }}" placeholder="round" required="required" />
       <input type="number" step=0.01 name="surface" value="{{ request.form['surface'] }}" placeholder="surface" required="required" />
