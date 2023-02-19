@@ -22,51 +22,13 @@
   <h4 style="color:#ffffff">
     {{result}}
   </h4>
-  <div class="h-100 d-flex flex-row-reverse justify-content-center align-items-center matchInfo">
+  <div >
      <!-- Main Input For Receiving Query to our ML -->
     <form action="{{ url_for('predict_interface') }}" method="post">
-      <div class="bg-primary"; >
-      <label style="color: black; ">Match and tournament information:</label>
-      <input  title="Enter the id of the tourenment" type="text" name="tourney_id" value="{{ request.form['tourney_id'] }}"  placeholder="tourney_id" required="required" />  
-      <input  title="Enter the date" type="date" name="tourney_date" value="{{ request.form['tourney_date'] }}" placeholder="tourney_date_1" required="required">
-      <select id="best_of_id" name="best_of" title="Best of">
-        <option value="Maximum number of sets played">Maximum number of sets played</option>
-        <option value="3">3</option>
-        <option value="5">5</option>
-      </select>
-      <input type="number" step=1 name="match_num" value="{{ request.form['match_num'] }}" placeholder="match_num" required="required" />
-      <select id="round" name="round" title="Round">
-        <option value="round">round</option>
-        <option value="R64">R64</option>
-        <option value="R32">R32</option>
-        <option value="R16">R16</option>
-        <option value="QF">QF</option>
-        <option value="R128">R128</option>
-        <option value="SF">SF</option>
-        <option value="F">F</option>
-        <option value="RR">RR</option>
-        <option value="BR">BR</option>
-      </select>
+      
+      <div class=" playerone"; >
 
-      <select id="surface" name="surface" title="Surface">
-        <option value="Surface Type">Surface Type</option>
-        <option value="Hard">Hard</option>
-        <option value="Grass">Grass</option>
-        <option value="Clay">Clay</option>
-        <option value="Carpet">Carpet</option>
-      </select>
-
-      <select id="tourney_level" name="tourney_level" title="tourney level">
-        <option value="tournament level">tournament level</option>
-        <option value="M">M</option>
-        <option value="A">A</option>
-        <option value="G">G</option>
-        <option value="D">D</option>
-        <option value="F">F</option>
-      </select>
-      </div>
-      <div class="bg-primary"; >
-      <label style="color: black;">Player 1 information:</label>
+      <label >Player 1 information:</label>
 
       <input type="number" step=1 name="p1_age" value="{{ request.form['p1_age'] }}" placeholder="p1_age" required="required" title="Enter player 1 age" min="0"/>
       
@@ -176,8 +138,8 @@
       <input type="number" step=0.01 name="p1_seed" value="{{ request.form['p1_seed'] }}" placeholder="p1_seed" required="required" />
     
     </div>
-    <div class="bg-primary"; >
-      <label style="color: black;">Player 2 information:</label>
+    <div class="playertwo"; >
+      <label>Player 2 information:</label>
       <input type="number" step=1 name="p2_age" value="{{ request.form['p2_age'] }}" placeholder="p2_age" required="required" />
       
       <select id="p2_hand" name="p2_hand" title="The hand used by the player 2">
@@ -283,6 +245,46 @@
       <input type="number" step=0.01 name="p2_rank_points" value="{{ request.form['p2_rank_points'] }}" placeholder="p2_rank_points" required="required" />
       <input type="number" step=0.01 name="p2_seed" value="{{ request.form['p2_seed'] }}" placeholder="p2_seed" required="required" />
     </div>
+    <div class=" matchInfo "; >
+      <label >Match and tournament information:</label>
+      <input  title="Enter the id of the tourenment" type="text" name="tourney_id" value="{{ request.form['tourney_id'] }}"  placeholder="tourney_id" required="required" />  
+      <input  title="Enter the date" type="date" name="tourney_date" value="{{ request.form['tourney_date'] }}" placeholder="tourney_date_1" required="required">
+      <select id="best_of_id" name="best_of" title="Best of">
+        <option value="Maximum number of sets played">Maximum number of sets played</option>
+        <option value="3">3</option>
+        <option value="5">5</option>
+      </select>
+      <input type="number" step=1 name="match_num" value="{{ request.form['match_num'] }}" placeholder="match_num" required="required" />
+      <select id="round" name="round" title="Round">
+        <option value="round">round</option>
+        <option value="R64">R64</option>
+        <option value="R32">R32</option>
+        <option value="R16">R16</option>
+        <option value="QF">QF</option>
+        <option value="R128">R128</option>
+        <option value="SF">SF</option>
+        <option value="F">F</option>
+        <option value="RR">RR</option>
+        <option value="BR">BR</option>
+      </select>
+
+      <select id="surface" name="surface" title="Surface">
+        <option value="Surface Type">Surface Type</option>
+        <option value="Hard">Hard</option>
+        <option value="Grass">Grass</option>
+        <option value="Clay">Clay</option>
+        <option value="Carpet">Carpet</option>
+      </select>
+
+      <select id="tourney_level" name="tourney_level" title="tourney level">
+        <option value="tournament level">tournament level</option>
+        <option value="M">M</option>
+        <option value="A">A</option>
+        <option value="G">G</option>
+        <option value="D">D</option>
+        <option value="F">F</option>
+      </select>
+      </div>
       <button type="submit" class="btn btn-primary btn-block btn-large">Predict Winner</button>
     </form>
     

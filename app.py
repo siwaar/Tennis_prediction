@@ -74,7 +74,11 @@ def predict_interface():
             try:
                 if feature in features_type_int: value = int(value)
                 elif feature in features_type_float: value = float(value)
-                elif feature in dict_features_options and value not in dict_features_options[feature]: value = 'None'
+                elif feature in dict_features_options and value not in dict_features_options[feature]:
+                    if feature in not_required_features :
+                        value = 'None'
+                    else :
+                        return render_template('index.html', result='Please select one of the options for this feature: {}'.format(feature))
                 elif feature == 'tourney_date' : value = value.replace('-', '')
                 values.append(value)
             except Exception as e:
@@ -93,6 +97,7 @@ def predict_interface():
     except Exception:
         return render_template('index.html')
 
+not_required_features = ['p1_hand', 'p2_hand', 'tourney_level']
 dict_features_options = {
             'best_of' : ['3','5'],
             'round' : ['R64', 'R32', 'R16', 'QF', 'R128', 'SF', 'F', 'RR', 'BR', 'Unkown'],

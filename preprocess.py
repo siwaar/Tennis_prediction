@@ -79,7 +79,7 @@ class PreProcessing:
               
         # fill nan values by a median
         for c in self.features_to_fill_by_median:
-            if self.data[c].count() > 0 :
+            if self.data[c].count() > 1 :
                 self.data[c] = self.data[c].fillna((self.data[c].median()))
             else: 
                 self.data[c] = self.data[c].fillna(0)
