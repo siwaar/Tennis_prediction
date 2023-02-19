@@ -1,6 +1,7 @@
 data_csv_path : 'data/ATP_tweaked.csv'
 data_to_predict_csv_path : 'data/data_to_predict.csv'
 predictions_csv_path : 'predictions/predictions.csv'
+scaler_path : 'models/scaler.pkl'
 onehot_encoder_path : 'models/onehot_encoder.pkl'
 target_encoder_path : 'models/target_encoder.pkl'
 model_path : 'models/lightGBM_model.pkl'
@@ -24,3 +25,5 @@ features_for_prediction : ['tourney_id', 'tourney_date', 'best_of', 'match_num',
  'p2_age', 'p2_hand', 'p2_ht', 'p2_id', 'p2_ioc', 'p2_rank','p2_rank_points', 'p2_seed']
 
 features_to_log : [ 'p2_rank', 'p2_rank_points', 'p2_seed','p1_id', 'p1_rank', 'p1_rank_points','p1_seed']
+features_to_scale : [ 'p2_rank', 'p2_rank_points', 'p2_seed','p1_id', 'p1_rank', 'p1_rank_points','p1_seed',
+'p1_age', 'p2_age', 'p1_ht', 'p2_ht',]

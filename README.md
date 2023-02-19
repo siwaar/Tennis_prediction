@@ -105,5 +105,6 @@ Results found on the test set:
 - More consider the time dependency.
 - More investigate in the fetaures description in order to extract more feature and also try a better way for feature selection.
 - Make predictions during the match by adding information about the current situation.
+- Improve the web interface and add more transformation on the input of the user in the interface
    
 

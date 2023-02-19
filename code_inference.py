@@ -14,12 +14,15 @@ class ATPWinnerPredict(object):
             self.params = yaml.load(f)
         # data
         self.data = load_data(self.params['data_to_predict_csv_path'])
+        # Scaler
+        self.scaler = pickle.load(open(self.params['scaler_path'], 'rb'))
         # One Hot Encoder Encoding
         self.ohe = pickle.load(open(self.params['onehot_encoder_path'], 'rb'))
         # Target Encoder
         self.target_encoder_params = pickle.load(open(self.params['target_encoder_path'], 'rb'))
         # model
         self.model =  pickle.load(open(self.params['model_path'], 'rb'))
+
 
     def run(self) -> None:
         
@@ -30,7 +33,8 @@ class ATPWinnerPredict(object):
         preprocessed_data = preprocessor.data
         if 'p1_won' in self.data.columns:
             preprocessed_data = preprocessed_data.drop(columns=['p1_won'], axis=1)
-        
+        # Scale numerical features
+        preprocessed_data[self.params['features_to_scale']] = self.scaler.transform(preprocessed_data[self.params['features_to_scale']].values)
         # Encoding
         oh_encoder = OHEncoder(self.params['low_cardinality_categorical_features'])
         # OneHotEnconder

@@ -1,8 +1,8 @@
 from ruamel.yaml import YAML
+from sklearn.preprocessing import RobustScaler
 from encoder import OHEncoder, TargetEncoder
 from preprocess import PreProcessing
 from utils import load_data, train_test_split_per_time, display_classification_result
-from sklearn.metrics import classification_report
 import pickle
 from train_model import train_models
 
@@ -26,7 +26,15 @@ def main() -> None:
     
     # split data and take into consideration time feature
     X_train, X_test, y_train, y_test = train_test_split_per_time(preprocessor.data)
-    
+
+    # Scale numerical features
+    features = X_train[params['features_to_scale']]
+    scaler = RobustScaler().fit(features.values)
+    X_train[params['features_to_scale']] = scaler.transform(features.values)
+    X_test[params['features_to_scale']] = scaler.transform(X_test[params['features_to_scale']].values)
+    # save model
+    pickle.dump(scaler, open(params['scaler_path'], 'wb'))
+
     # OneHotEnconder
     oh_encoder = OHEncoder(params['low_cardinality_categorical_features'])
     ohe = oh_encoder.get_onehot_encoder(X_train)
