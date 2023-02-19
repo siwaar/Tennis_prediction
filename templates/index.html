@@ -17,43 +17,276 @@
   } 
   </style> 
 
-<body style="background-image: url('../static/images/tennis.jpg');">
-
- <div class="login"; overflow-y:auto;>
-	<h1>Tennis Winner Predictor</h1>
+<body class="bg">
+  <h1>Tennis Winner Predictor</h1>
+  <h4 style="color:#ffffff">
+    {{result}}
+  </h4>
+  <div class="h-100 d-flex flex-row-reverse justify-content-center align-items-center matchInfo">
      <!-- Main Input For Receiving Query to our ML -->
     <form action="{{ url_for('predict_interface') }}" method="post">
-      <input type="number" step=0.01 name="tourney_id" value="{{ request.form['tourney_id'] }}"  placeholder="tourney_id" required="required" />  
-      <input type="number" step=0.01 name="tourney_date" value="{{ request.form['tourney_date'] }}"  placeholder="tourney_date" required="required" /> 
-      <input type="number" step=0.01 name="best_of" value="{{ request.form['best_of'] }}"  placeholder="best_of" required="no" />
-      <input type="number" step=0.01 name="match_num" value="{{ request.form['match_num'] }}" placeholder="match_num" required="required" />
-      <input type="number" step=0.01 name="round" value="{{ request.form['round'] }}" placeholder="round" required="required" />
-      <input type="number" step=0.01 name="surface" value="{{ request.form['surface'] }}" placeholder="surface" required="required" />
-      <input type="number" step=0.01 name="tourney_level" value="{{ request.form['tourney_level'] }}" placeholder="tourney_level" required="no" />
-      <input type="number" step=0.01 name="p1_age" value="{{ request.form['p1_age'] }}" placeholder="p1_age" required="required" />
-      <input type="number" step=0.01 name="p1_hand" value="{{ request.form['p1_hand'] }}" placeholder="p1_hand" required="no" />
+      <div class="bg-primary"; >
+      <label style="color: black; ">Match and tournament information:</label>
+      <input  title="Enter the id of the tourenment" type="text" name="tourney_id" value="{{ request.form['tourney_id'] }}"  placeholder="tourney_id" required="required" />  
+      <input  title="Enter the date" type="date" name="tourney_date" value="{{ request.form['tourney_date'] }}" placeholder="tourney_date_1" required="required">
+      <select id="best_of_id" name="best_of" title="Best of">
+        <option value="Maximum number of sets played">Maximum number of sets played</option>
+        <option value="3">3</option>
+        <option value="5">5</option>
+      </select>
+      <input type="number" step=1 name="match_num" value="{{ request.form['match_num'] }}" placeholder="match_num" required="required" />
+      <select id="round" name="round" title="Round">
+        <option value="round">round</option>
+        <option value="R64">R64</option>
+        <option value="R32">R32</option>
+        <option value="R16">R16</option>
+        <option value="QF">QF</option>
+        <option value="R128">R128</option>
+        <option value="SF">SF</option>
+        <option value="F">F</option>
+        <option value="RR">RR</option>
+        <option value="BR">BR</option>
+      </select>
+
+      <select id="surface" name="surface" title="Surface">
+        <option value="Surface Type">Surface Type</option>
+        <option value="Hard">Hard</option>
+        <option value="Grass">Grass</option>
+        <option value="Clay">Clay</option>
+        <option value="Carpet">Carpet</option>
+      </select>
+
+      <select id="tourney_level" name="tourney_level" title="tourney level">
+        <option value="tournament level">tournament level</option>
+        <option value="M">M</option>
+        <option value="A">A</option>
+        <option value="G">G</option>
+        <option value="D">D</option>
+        <option value="F">F</option>
+      </select>
+      </div>
+      <div class="bg-primary"; >
+      <label style="color: black;">Player 1 information:</label>
+
+      <input type="number" step=1 name="p1_age" value="{{ request.form['p1_age'] }}" placeholder="p1_age" required="required" title="Enter player 1 age" min="0"/>
+      
+      <select id="p1_hand" name="p1_hand" title="The hand used by the player 1">
+        <option value="Player 1 Hand">Player 1 hand</option>
+        <option value="L">L</option>
+        <option value="R">R</option>
+      </select>
+
       <input type="number" step=0.01 name="p1_ht" value="{{ request.form['p1_ht'] }}" placeholder="p1_ht" required="required" />
-      <input type="number" step=0.01 name="p1_id" value="{{ request.form['p1_id'] }}" placeholder="p1_id" required="required" />
-      <input type="number" step=0.01 name="p1_ioc" value="{{ request.form['p1_ioc'] }}" placeholder="p1_ioc" required="required" />
-      <input type="number" step=0.01 name="p1_rank" value="{{ request.form['p1_rank'] }}" placeholder="p1_rank" required="required" />
+      
+      <input type="number" step=1 name="p1_id" value="{{ request.form['p1_id'] }}" placeholder="p1_id" required="required" />
+      
+      <select id="p1_ioc" name="p1_ioc" title="Country of origin">
+        <option value="Player 1 country of origin">Player 1 country of origin</option>
+      <option value="ESP">ESP</option> 
+      <option value="CYP">CYP</option> 
+      <option value="USA">USA</option> 
+      <option value="NED">NED</option> 
+      <option value="SRB">SRB</option> 
+      <option value="RUS">RUS</option> 
+      <option value="CAN">CAN</option> 
+      <option value="SVK">SVK</option> 
+      <option value="GBR">GBR</option> 
+      <option value="FRA">FRA</option> 
+      <option value="BEL">BEL</option> 
+      <option value="HUN">HUN</option> 
+      <option value="JPN">JPN</option> 
+      <option value="CRO">CRO</option> 
+      <option value="ARG">ARG</option> 
+      <option value="AUT">AUT</option> 
+      <option value="POL">POL</option> 
+      <option value="ISR">ISR</option> 
+      <option value="SRI">SRI</option> 
+      <option value="SLO">SLO</option> 
+      <option value="IND">IND</option> 
+      <option value="AUS">AUS</option> 
+      <option value="RSA">RSA</option> 
+      <option value="LAT">LAT</option> 
+      <option value="LUX">LUX</option> 
+      <option value="GER">GER</option> 
+      <option value="COL">COL</option> 
+      <option value="BOL">BOL</option> 
+      <option value="NOR">NOR</option> 
+      <option value="TPE">TPE</option> 
+      <option value="KOR">KOR</option> 
+      <option value="ITA">ITA</option> 
+      <option value="BIH">BIH</option> 
+      <option value="UKR">UKR</option> 
+      <option value="KAZ">KAZ</option> 
+      <option value="TUN">TUN</option> 
+      <option value="PAK">PAK</option> 
+      <option value="CZE">CZE</option> 
+      <option value="BRA">BRA</option> 
+      <option value="EST">EST</option> 
+      <option value="URU">URU</option> 
+      <option value="POR">POR</option> 
+      <option value="BAR">BAR</option> 
+      <option value="SWE">SWE</option> 
+      <option value="SUI">SUI</option> 
+      <option value="ROU">ROU</option> 
+      <option value="BUL">BUL</option> 
+      <option value="PER">PER</option> 
+      <option value="TUR">TUR</option> 
+      <option value="LTU">LTU</option> 
+      <option value="DOM">DOM</option> 
+      <option value="GRE">GRE</option> 
+      <option value="ECU">ECU</option> 
+      <option value="UZB">UZB</option> 
+      <option value="PHI">PHI</option> 
+      <option value="CHI">CHI</option> 
+      <option value="BLR">BLR</option> 
+      <option value="THA">THA</option> 
+      <option value="MDA">MDA</option> 
+      <option value="FIN">FIN</option> 
+      <option value="ZIM">ZIM</option> 
+      <option value="VEN">VEN</option> 
+      <option value="INA">INA</option> 
+      <option value="MON">MON</option> 
+      <option value="CRC">CRC</option> 
+      <option value="ALG">ALG</option> 
+      <option value="CHN">CHN</option> 
+      <option value="KUW">KUW</option> 
+      <option value="DEN">DEN</option> 
+      <option value="NZL">NZL</option> 
+      <option value="EGY">EGY</option> 
+      <option value="MEX">MEX</option> 
+      <option value="GEO">GEO</option> 
+      <option value="VIE">VIE</option> 
+      <option value="PAR">PAR</option> 
+      <option value="LIB">LIB</option> 
+      <option value="MAR">MAR</option> 
+      <option value="PUR">PUR</option> 
+      <option value="ESA">ESA</option> 
+      <option value="BAH">BAH</option> 
+      <option value="MAS">MAS</option> 
+      <option value="GUA">GUA</option> 
+      <option value="IRL">IRL</option> 
+      <option value="IRI">IRI</option> 
+      <option value="MAD">MAD</option> 
+      <option value="QAT">QAT</option> 
+      <option value="HKG">HKG</option> 
+      <option value="UAE">UAE</option> 
+      </select>
+     <input type="number" step=0.01 name="p1_rank" value="{{ request.form['p1_rank'] }}" placeholder="p1_rank" required="required" />
       <input type="number" step=0.01 name="p1_rank_points" value="{{ request.form['p1_rank_points'] }}" placeholder="p1_rank_points" required="required" />
       <input type="number" step=0.01 name="p1_seed" value="{{ request.form['p1_seed'] }}" placeholder="p1_seed" required="required" />
-      <input type="number" step=0.01 name="p2_age" value="{{ request.form['p2_age'] }}" placeholder="p2_age" required="required" />
-      <input type="number" step=0.01 name="p2_hand" value="{{ request.form['p2_hand'] }}" placeholder="p2_hand" required="no" />
+    
+    </div>
+    <div class="bg-primary"; >
+      <label style="color: black;">Player 2 information:</label>
+      <input type="number" step=1 name="p2_age" value="{{ request.form['p2_age'] }}" placeholder="p2_age" required="required" />
+      
+      <select id="p2_hand" name="p2_hand" title="The hand used by the player 2">
+        <option value="Player 2 Hand">Player 2 hand</option>
+        <option value="L">L</option>
+        <option value="R">R</option>
+      </select>
       <input type="number" step=0.01 name="p2_ht" value="{{ request.form['p2_ht'] }}" placeholder="p2_ht" required="required" />
       <input type="number" step=0.01 name="p2_id" value="{{ request.form['p2_id'] }}" placeholder="p2_id" required="required" />
-      <input type="number" step=0.01 name="p2_ioc" value="{{ request.form['p2_ioc'] }}" placeholder="p2_ioc" required="required" />
+      <select id="p2_ioc" name="p2_ioc" title="Country of origin">
+        <option value="Player 2 country of origin">Player 2 country of origin</option>
+      <option value="ESP">ESP</option> 
+      <option value="CYP">CYP</option> 
+      <option value="USA">USA</option> 
+      <option value="NED">NED</option> 
+      <option value="SRB">SRB</option> 
+      <option value="RUS">RUS</option> 
+      <option value="CAN">CAN</option> 
+      <option value="SVK">SVK</option> 
+      <option value="GBR">GBR</option> 
+      <option value="FRA">FRA</option> 
+      <option value="BEL">BEL</option> 
+      <option value="HUN">HUN</option> 
+      <option value="JPN">JPN</option> 
+      <option value="CRO">CRO</option> 
+      <option value="ARG">ARG</option> 
+      <option value="AUT">AUT</option> 
+      <option value="POL">POL</option> 
+      <option value="ISR">ISR</option> 
+      <option value="SRI">SRI</option> 
+      <option value="SLO">SLO</option> 
+      <option value="IND">IND</option> 
+      <option value="AUS">AUS</option> 
+      <option value="RSA">RSA</option> 
+      <option value="LAT">LAT</option> 
+      <option value="LUX">LUX</option> 
+      <option value="GER">GER</option> 
+      <option value="COL">COL</option> 
+      <option value="BOL">BOL</option> 
+      <option value="NOR">NOR</option> 
+      <option value="TPE">TPE</option> 
+      <option value="KOR">KOR</option> 
+      <option value="ITA">ITA</option> 
+      <option value="BIH">BIH</option> 
+      <option value="UKR">UKR</option> 
+      <option value="KAZ">KAZ</option> 
+      <option value="TUN">TUN</option> 
+      <option value="PAK">PAK</option> 
+      <option value="CZE">CZE</option> 
+      <option value="BRA">BRA</option> 
+      <option value="EST">EST</option> 
+      <option value="URU">URU</option> 
+      <option value="POR">POR</option> 
+      <option value="BAR">BAR</option> 
+      <option value="SWE">SWE</option> 
+      <option value="SUI">SUI</option> 
+      <option value="ROU">ROU</option> 
+      <option value="BUL">BUL</option> 
+      <option value="PER">PER</option> 
+      <option value="TUR">TUR</option> 
+      <option value="LTU">LTU</option> 
+      <option value="DOM">DOM</option> 
+      <option value="GRE">GRE</option> 
+      <option value="ECU">ECU</option> 
+      <option value="UZB">UZB</option> 
+      <option value="PHI">PHI</option> 
+      <option value="CHI">CHI</option> 
+      <option value="BLR">BLR</option> 
+      <option value="THA">THA</option> 
+      <option value="MDA">MDA</option> 
+      <option value="FIN">FIN</option> 
+      <option value="ZIM">ZIM</option> 
+      <option value="VEN">VEN</option> 
+      <option value="INA">INA</option> 
+      <option value="MON">MON</option> 
+      <option value="CRC">CRC</option> 
+      <option value="ALG">ALG</option> 
+      <option value="CHN">CHN</option> 
+      <option value="KUW">KUW</option> 
+      <option value="DEN">DEN</option> 
+      <option value="NZL">NZL</option> 
+      <option value="EGY">EGY</option> 
+      <option value="MEX">MEX</option> 
+      <option value="GEO">GEO</option> 
+      <option value="VIE">VIE</option> 
+      <option value="PAR">PAR</option> 
+      <option value="LIB">LIB</option> 
+      <option value="MAR">MAR</option> 
+      <option value="PUR">PUR</option> 
+      <option value="ESA">ESA</option> 
+      <option value="BAH">BAH</option> 
+      <option value="MAS">MAS</option> 
+      <option value="GUA">GUA</option> 
+      <option value="IRL">IRL</option> 
+      <option value="IRI">IRI</option> 
+      <option value="MAD">MAD</option> 
+      <option value="QAT">QAT</option> 
+      <option value="HKG">HKG</option> 
+      <option value="UAE">UAE</option> 
+      </select>
+    
       <input type="number" step=0.01 name="p2_rank" value="{{ request.form['p2_rank'] }}" placeholder="p2_rank" required="required" />
       <input type="number" step=0.01 name="p2_rank_points" value="{{ request.form['p2_rank_points'] }}" placeholder="p2_rank_points" required="required" />
       <input type="number" step=0.01 name="p2_seed" value="{{ request.form['p2_seed'] }}" placeholder="p2_seed" required="required" />
-    <button type="submit" class="btn btn-primary btn-block btn-large">Predict Winner</button>
+    </div>
+      <button type="submit" class="btn btn-primary btn-block btn-large">Predict Winner</button>
     </form>
-
-   <br>
-   <br>
-   <h4 style="color:#ffffff">
-    {{result}}
-    </h4>
+    
+   
  </div>
 </body>
 </html>

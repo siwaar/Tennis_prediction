@@ -26,4 +26,4 @@ features_for_prediction : ['tourney_id', 'tourney_date', 'best_of', 'match_num',
 
 features_to_log : [ 'p2_rank', 'p2_rank_points', 'p2_seed','p1_id', 'p1_rank', 'p1_rank_points','p1_seed']
 features_to_scale : [ 'p2_rank', 'p2_rank_points', 'p2_seed','p1_id', 'p1_rank', 'p1_rank_points','p1_seed',
-'p1_age', 'p2_age', 'p1_ht', 'p2_ht',]
+'p1_age', 'p2_age', 'p1_ht', 'p2_ht']

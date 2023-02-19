@@ -15,20 +15,60 @@ body {
 
 }
 .login {
-	position: absolute;
+	position: relative;
 	top: 40%;
 	left: 50%;
 	margin: -150px 0 0 -150px;
 	width:400px;
-	height:400px;
-	
+	height:400px;	
 }
+.matchInfo{
+	display: inline-block;
+	left: 5%;
+	width: 35%;
+	border:10%;
+}
+
+.playerone{
+	display: inline-block;
+	width: 30%;
+	border:10%;
+}
+
+.playertwo{
+	display: inline-block;
+	right:5%;
+	left:50%;
+	top:70%;
+	width: 40%;
+	vertical-align: middle;
+}
+
+h1 { color: #fff; text-shadow: 0 0 10px rgba(0,0,0,0.3); letter-spacing:1px; text-align:center; }
 
 .login h1 { color: #fff; text-shadow: 0 0 10px rgba(0,0,0,0.3); letter-spacing:1px; text-align:center; }
 
-input {
+.form-group {
 	width: 100%;
 	margin-bottom: 10px;
+  }
+
+.bg {
+	/* The image used */
+	background-image: url('../images/tennis.jpg');
+  
+	/* Full height */
+	height: 100%; 
+  
+	/* Center and scale the image nicely */
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+  }
+  
+  input, select {
+	display: inline-block;
+	width: 100%;
 	background: rgba(0,0,0,0.3);
 	border: none;
 	outline: none;
@@ -44,4 +84,4 @@ input {
 	-o-transition: box-shadow .5s ease;
 	-ms-transition: box-shadow .5s ease;
 	transition: box-shadow .5s ease;
-}
+  }
