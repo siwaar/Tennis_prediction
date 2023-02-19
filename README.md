@@ -64,10 +64,20 @@ We need to go to the root directory of the project and execute the following com
 $ python3 app.py
 ```
 
-## Access to web application
+## Access to web application in local
 Browse http://localhost:5000
 
 ![Interface screen](static/images/interface.PNG)
+
+## Run the project through a pre-made Docker image
+```
+docker pull siwarabbes/tennis_prediction
+```
+```
+docker run -d -p 5000:5000 siwarabbes/tennis_prediction:latest
+```
+then Browse http://localhost:5000
+
 ## Models used
 We first used different methods to get the encoding and add new features and then we used LightGBM model to predict the winner of a tennis match.
 - You will find more documentation of the choice of different models in : `ABBES_Siwar_LBC_UseCase.ipynb`
