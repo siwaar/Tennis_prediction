@@ -35,7 +35,7 @@ In order to regenerate the prediction model, you need to run :
 python main.py
 ```
 
-## Predict results for a new dataset
+## Predict results for a new dataset using a python script
 In the config file : `config.yaml`, you need to specify :
 
 `data_to_predict_csv_path` : The path for the new datatset to predict, example : 'data/data_to_predict.csv' and run :
@@ -70,7 +70,7 @@ Browse http://localhost:5000
 ![Interface screen](static/images/interface.PNG)
 ## Models used
 We first used different methods to get the encoding and add new features and then we used LightGBM model to predict the winner of a tennis match.
-You will find more documentation of the choice of different models in : `documentation`
+You will find more documentation of the choice of different models in : `ABBES_Siwar_LBC_UseCase.ipynb`
 You will find trained model and encoders in the folder : `models`
 
 ## Project description
