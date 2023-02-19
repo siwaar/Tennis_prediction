@@ -46,6 +46,15 @@ python code_inference.py
 
 You will find predictions of our model in : `predictions/predictions.csv`
 
+## Run the project through a pre-made Docker image
+```
+docker pull siwarabbes/tennis_prediction
+```
+```
+docker run -d -p 5000:5000 siwarabbes/tennis_prediction:latest
+```
+then Browse http://localhost:5000
+[Interface screen](static/images/interface.PNG)
 ## Deploy web service and web application using docker
 
 First of all, we need to have docker installed on our machine:[link to install Docker](https://docs.docker.com/engine/install/)
@@ -64,19 +73,7 @@ We need to go to the root directory of the project and execute the following com
 $ python3 app.py
 ```
 
-## Access to web application in local
-Browse http://localhost:5000
-
-![Interface screen](static/images/interface.PNG)
-
-## Run the project through a pre-made Docker image
-```
-docker pull siwarabbes/tennis_prediction
-```
-```
-docker run -d -p 5000:5000 siwarabbes/tennis_prediction:latest
-```
-then Browse http://localhost:5000
+Then browse http://localhost:5000
 
 ## Models used
 We first used different methods to get the encoding and add new features and then we used LightGBM model to predict the winner of a tennis match.
