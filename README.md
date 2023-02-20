@@ -1,4 +1,4 @@
-# LittleBigCode Use Case : Prediction of the winner of a tennis match.
+# Prediction of the winner of a tennis match.
 Author : [Siwar ABBES](https://www.linkedin.com/in/siwar-abbes/)
 
 **The aim of this work** is to explore data from ATP tennis competitions in order to predict the results of tennis matches.
