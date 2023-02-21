@@ -78,7 +78,7 @@ Then browse http://localhost:5000
 
 ## Models used
 We first used different methods to get the encoding and add new features and then we used LightGBM model to predict the winner of a tennis match.
-- You will find more documentation of the choice of different models in : `ABBES_Siwar_LBC_UseCase.ipynb`
+- You will find more documentation of the choice of different models in : `Tennis_prediction.ipynb`
 - You will find trained model, scaler and encoders in the folder : `models`
 
 ## Project description
