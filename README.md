@@ -98,7 +98,7 @@ This ML project is a supervised binary classification where our target feature c
 To **fine tune the hyperparameters** of our classifier model, we used **Grid Search** with **Time Series Cross Validation**.
 
 ## Evaluation 
-Since our dataset is **balanced**, the **metric of evaluation** we used is **F1 score** which represents both precision and recall in one metric. 
+Since our dataset is **imbalanced**, the **metric of evaluation** we used is **F1 score** which represents both precision and recall in one metric. 
 We split our dataset in 80% Train and 20% Test sets.
 Results found on the test set: `F1 score = 63%` 
 
